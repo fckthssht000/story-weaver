@@ -35,8 +35,9 @@ function renderNode(node: DocNode, key: number): ReactNode {
       return <p key={key}>{children?.length ? children : <br />}</p>;
     case "heading": {
       const level = Math.min(Math.max(Number(node.attrs?.["level"] ?? 2), 1), 3);
-      const Tag = (["h1", "h2", "h3"] as const)[level - 1];
-      return <Tag key={key}>{children}</Tag>;
+      if (level === 1) return <h1 key={key}>{children}</h1>;
+      if (level === 2) return <h2 key={key}>{children}</h2>;
+      return <h3 key={key}>{children}</h3>;
     }
     case "blockquote":
       return <blockquote key={key}>{children}</blockquote>;
