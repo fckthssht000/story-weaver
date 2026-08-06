@@ -10,33 +10,134 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as LibraryRouteImport } from './routes/library'
+import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticated/account'
+import { Route as ReadStoryIdRouteImport } from './routes/read.$storyId'
+import { Route as StoryStoryIdRouteImport } from './routes/story.$storyId'
+import { Route as AuthenticatedWriteIndexRouteImport } from './routes/_authenticated/write.index'
+import { Route as AuthenticatedWriteStoryIdRouteImport } from './routes/_authenticated/write.$storyId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LibraryRoute = LibraryRouteImport.update({
+  id: '/library',
+  path: '/library',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedAccountRoute = AuthenticatedAccountRouteImport.update({
+  id: '/account',
+  path: '/account',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const ReadStoryIdRoute = ReadStoryIdRouteImport.update({
+  id: '/read/$storyId',
+  path: '/read/$storyId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StoryStoryIdRoute = StoryStoryIdRouteImport.update({
+  id: '/story/$storyId',
+  path: '/story/$storyId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedWriteIndexRoute = AuthenticatedWriteIndexRouteImport.update({
+  id: '/write/',
+  path: '/write/',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedWriteStoryIdRoute =
+  AuthenticatedWriteStoryIdRouteImport.update({
+    id: '/write/$storyId',
+    path: '/write/$storyId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/library': typeof LibraryRoute
+  '/account': typeof AuthenticatedAccountRoute
+  '/read/$storyId': typeof ReadStoryIdRoute
+  '/story/$storyId': typeof StoryStoryIdRoute
+  '/write/$storyId': typeof AuthenticatedWriteStoryIdRoute
+  '/write/': typeof AuthenticatedWriteIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/library': typeof LibraryRoute
+  '/account': typeof AuthenticatedAccountRoute
+  '/read/$storyId': typeof ReadStoryIdRoute
+  '/story/$storyId': typeof StoryStoryIdRoute
+  '/write/$storyId': typeof AuthenticatedWriteStoryIdRoute
+  '/write': typeof AuthenticatedWriteIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/library': typeof LibraryRoute
+  '/_authenticated/account': typeof AuthenticatedAccountRoute
+  '/read/$storyId': typeof ReadStoryIdRoute
+  '/story/$storyId': typeof StoryStoryIdRoute
+  '/_authenticated/write/$storyId': typeof AuthenticatedWriteStoryIdRoute
+  '/_authenticated/write/': typeof AuthenticatedWriteIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/library'
+    | '/account'
+    | '/read/$storyId'
+    | '/story/$storyId'
+    | '/write/$storyId'
+    | '/write/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/auth'
+    | '/library'
+    | '/account'
+    | '/read/$storyId'
+    | '/story/$storyId'
+    | '/write/$storyId'
+    | '/write'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/auth'
+    | '/library'
+    | '/_authenticated/account'
+    | '/read/$storyId'
+    | '/story/$storyId'
+    | '/_authenticated/write/$storyId'
+    | '/_authenticated/write/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRoute: typeof AuthRoute
+  LibraryRoute: typeof LibraryRoute
+  ReadStoryIdRoute: typeof ReadStoryIdRoute
+  StoryStoryIdRoute: typeof StoryStoryIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,22 +149,88 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/library': {
+      id: '/library'
+      path: '/library'
+      fullPath: '/library'
+      preLoaderRoute: typeof LibraryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/account': {
+      id: '/_authenticated/account'
+      path: '/account'
+      fullPath: '/account'
+      preLoaderRoute: typeof AuthenticatedAccountRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/read/$storyId': {
+      id: '/read/$storyId'
+      path: '/read/$storyId'
+      fullPath: '/read/$storyId'
+      preLoaderRoute: typeof ReadStoryIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/story/$storyId': {
+      id: '/story/$storyId'
+      path: '/story/$storyId'
+      fullPath: '/story/$storyId'
+      preLoaderRoute: typeof StoryStoryIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/write/': {
+      id: '/_authenticated/write/'
+      path: '/write'
+      fullPath: '/write/'
+      preLoaderRoute: typeof AuthenticatedWriteIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/write/$storyId': {
+      id: '/_authenticated/write/$storyId'
+      path: '/write/$storyId'
+      fullPath: '/write/$storyId'
+      preLoaderRoute: typeof AuthenticatedWriteStoryIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAccountRoute: typeof AuthenticatedAccountRoute
+  AuthenticatedWriteStoryIdRoute: typeof AuthenticatedWriteStoryIdRoute
+  AuthenticatedWriteIndexRoute: typeof AuthenticatedWriteIndexRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAccountRoute: AuthenticatedAccountRoute,
+  AuthenticatedWriteStoryIdRoute: AuthenticatedWriteStoryIdRoute,
+  AuthenticatedWriteIndexRoute: AuthenticatedWriteIndexRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
+  LibraryRoute: LibraryRoute,
+  ReadStoryIdRoute: ReadStoryIdRoute,
+  StoryStoryIdRoute: StoryStoryIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
