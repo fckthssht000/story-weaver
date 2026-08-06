@@ -4,11 +4,11 @@ import type { DocNode } from "@/types";
 import type { ReaderPrefs } from "@/hooks/useReaderPrefs";
 
 interface Props {
-  title?: string | null;
-  storyTitle?: string;
+  title?: string | null | undefined;
+  storyTitle?: string | undefined;
   content: DocNode | null;
   prefs: ReaderPrefs;
-  footer?: ReactNode;
+  footer?: ReactNode | undefined;
 }
 
 /**
