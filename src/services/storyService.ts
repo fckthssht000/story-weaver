@@ -121,11 +121,11 @@ export async function createChapter(storyId: string, title: string, orderIndex: 
 }
 
 export async function saveChapter(id: string, patch: { title?: string | null; content?: DocNode }) {
-  const update: Record<string, unknown> = {};
-  if (patch.title !== undefined) update["title"] = patch.title;
+  const update: { title?: string | null; content?: never; content_hash?: string } = {};
+  if (patch.title !== undefined) update.title = patch.title;
   if (patch.content !== undefined) {
-    update["content"] = patch.content;
-    update["content_hash"] = contentHash(patch.content);
+    update.content = patch.content as never;
+    update.content_hash = contentHash(patch.content);
   }
   return unwrap(
     await supabase.from("chapters").update(update).eq("id", id).select("*").single(),
