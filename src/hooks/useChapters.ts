@@ -66,7 +66,10 @@ export function useChapterMutations(storyId: string | undefined) {
 
   const save = useMutation({
     mutationFn: ({ id, title, content }: { id: string; title?: string; content?: DocNode }) =>
-      saveChapter(id, { title, content }),
+      saveChapter(id, {
+        ...(title !== undefined ? { title } : {}),
+        ...(content !== undefined ? { content } : {}),
+      }),
     onSuccess: invalidate,
   });
 
