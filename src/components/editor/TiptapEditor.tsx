@@ -59,7 +59,7 @@ export function TiptapEditor({ content, onChange }: Props) {
 
   if (!editor) return <div className="min-h-[50vh] animate-pulse rounded-md bg-muted/50" />;
 
-  const btn = (active: boolean) => (active ? "secondary" : "ghost") as const;
+  const btn = (active: boolean): "secondary" | "ghost" => (active ? "secondary" : "ghost");
 
   return (
     <div className="rounded-lg border bg-card">
