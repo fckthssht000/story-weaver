@@ -193,3 +193,27 @@ export function toLocalChapter(chapter: Chapter): LocalChapter {
     content_hash: chapter.content_hash,
   };
 }
+
+/* ---------- maintenance ---------- */
+
+/** Wipes every downloaded story, chapter and locally stored progress row. */
+export async function clearOfflineData() {
+  if (!offlineAvailable()) return;
+  const t = await tx([STORE_STORIES, STORE_CHAPTERS, STORE_PROGRESS], "readwrite");
+  t.objectStore(STORE_STORIES).clear();
+  t.objectStore(STORE_CHAPTERS).clear();
+  t.objectStore(STORE_PROGRESS).clear();
+  await new Promise<void>((resolve, reject) => {
+    t.oncomplete = () => resolve();
+    t.onerror = () => reject(t.error);
+  });
+}
+
+/** Rough size of the offline library, for the settings screen. */
+export async function offlineUsage() {
+  if (!offlineAvailable()) return { stories: 0, chapters: 0 };
+  const t = await tx([STORE_STORIES, STORE_CHAPTERS], "readonly");
+  const stories = await done(t.objectStore(STORE_STORIES).count());
+  const chapters = await done(t.objectStore(STORE_CHAPTERS).count());
+  return { stories, chapters };
+}
