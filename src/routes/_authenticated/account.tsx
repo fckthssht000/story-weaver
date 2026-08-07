@@ -1,7 +1,17 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Camera, Heart, Loader2, LogOut, Settings as SettingsIcon, BookText, History, Bookmark, Sparkles } from "lucide-react";
+import {
+  Camera,
+  Heart,
+  Loader2,
+  LogOut,
+  Settings as SettingsIcon,
+  BookText,
+  History,
+  Bookmark,
+  Sparkles,
+} from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import { useRealtime } from "@/hooks/useRealtime";
@@ -60,7 +70,7 @@ function Account() {
   const recentReads = useRecentReads(userId);
   const bookmarks = useBookmarks(userId);
   const myStories = useMyStories(userId);
-  const publishedStories = myStories.data?.filter(s => s.status === 'published');
+  const publishedStories = myStories.data?.filter((s) => s.status === "published");
 
   const stats = useQuery({
     queryKey: ["author-stats", userId],
@@ -92,7 +102,10 @@ function Account() {
   const save = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!userId) return;
-    const handle = username.trim().toLowerCase().replace(/[^a-z0-9_]/g, "");
+    const handle = username
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9_]/g, "");
     if (handle.length < 3) {
       toast.error("Usernames need at least 3 letters, numbers or underscores.");
       return;
@@ -100,7 +113,11 @@ function Account() {
     setBusy(true);
     const { error } = await supabase
       .from("profiles")
-      .update({ username: handle, display_name: displayName.trim() || null, bio: bio.trim() || null })
+      .update({
+        username: handle,
+        display_name: displayName.trim() || null,
+        bio: bio.trim() || null,
+      })
       .eq("id", userId);
     setBusy(false);
     if (error) {
@@ -118,7 +135,10 @@ function Account() {
     try {
       const previous = profile?.avatar_url ?? null;
       const url = await uploadMedia("avatars", userId, file, "avatar");
-      const { error } = await supabase.from("profiles").update({ avatar_url: url }).eq("id", userId);
+      const { error } = await supabase
+        .from("profiles")
+        .update({ avatar_url: url })
+        .eq("id", userId);
       if (error) throw new Error(error.message);
       void removeMedia("avatars", previous);
       qc.invalidateQueries({ queryKey: ["profile"] });
@@ -176,7 +196,9 @@ function Account() {
               <h1 className="truncate font-display text-[1.4rem] font-bold leading-none text-primary">
                 {profile?.display_name || profile?.username || "Your profile"}
               </h1>
-              <p className="truncate text-sm text-muted-foreground mt-1">@{profile?.username ?? "…"}</p>
+              <p className="truncate text-sm text-muted-foreground mt-1">
+                @{profile?.username ?? "…"}
+              </p>
               <p className="truncate text-sm text-muted-foreground">{session?.user.email}</p>
               {profile?.bio && (
                 <p className="mt-2 text-[0.9rem] leading-relaxed line-clamp-3">{profile.bio}</p>
@@ -186,20 +208,27 @@ function Account() {
 
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-              <Button variant="outline" size="sm" className="shrink-0 h-8 rounded-full px-4 text-xs font-semibold bg-background/80 backdrop-blur-sm">
+              <Button
+                variant="outline"
+                size="sm"
+                className="shrink-0 h-8 rounded-full px-4 text-xs font-semibold bg-background/80 backdrop-blur-sm"
+              >
                 Edit Profile
               </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-md">
               <DialogHeader>
                 <DialogTitle className="text-xl font-display">Edit Profile</DialogTitle>
-                <DialogDescription>
-                  Update your public profile details and bio.
-                </DialogDescription>
+                <DialogDescription>Update your public profile details and bio.</DialogDescription>
               </DialogHeader>
               <form className="space-y-5 pt-2" onSubmit={save}>
                 <div className="space-y-2">
-                  <Label htmlFor="username" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Username</Label>
+                  <Label
+                    htmlFor="username"
+                    className="text-xs font-semibold uppercase tracking-wider text-muted-foreground"
+                  >
+                    Username
+                  </Label>
                   <Input
                     id="username"
                     value={username}
@@ -207,19 +236,31 @@ function Account() {
                     placeholder="penname"
                     className="bg-muted/50 border-transparent focus-visible:bg-transparent"
                   />
-                  <p className="text-[0.7rem] text-muted-foreground">Lowercase letters, numbers and underscores.</p>
+                  <p className="text-[0.7rem] text-muted-foreground">
+                    Lowercase letters, numbers and underscores.
+                  </p>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="dn" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Display name</Label>
-                  <Input 
-                    id="dn" 
-                    value={displayName} 
-                    onChange={(e) => setDisplayName(e.target.value)} 
+                  <Label
+                    htmlFor="dn"
+                    className="text-xs font-semibold uppercase tracking-wider text-muted-foreground"
+                  >
+                    Display name
+                  </Label>
+                  <Input
+                    id="dn"
+                    value={displayName}
+                    onChange={(e) => setDisplayName(e.target.value)}
                     className="bg-muted/50 border-transparent focus-visible:bg-transparent"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="bio" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Bio</Label>
+                  <Label
+                    htmlFor="bio"
+                    className="text-xs font-semibold uppercase tracking-wider text-muted-foreground"
+                  >
+                    Bio
+                  </Label>
                   <Textarea
                     id="bio"
                     rows={4}
@@ -231,7 +272,11 @@ function Account() {
                   />
                   <p className="text-right text-[0.7rem] text-muted-foreground">{bio.length}/400</p>
                 </div>
-                <Button type="submit" disabled={busy} className="w-full rounded-full h-11 font-semibold">
+                <Button
+                  type="submit"
+                  disabled={busy}
+                  className="w-full rounded-full h-11 font-semibold"
+                >
                   {busy ? <Loader2 className="size-4 animate-spin mr-2" /> : null}
                   Save Changes
                 </Button>
@@ -247,9 +292,14 @@ function Account() {
           { label: "Published", value: stats.data?.published ?? 0, icon: BookText },
           { label: "Likes", value: stats.data?.likes ?? 0, icon: Heart },
         ].map((s) => (
-          <div key={s.label} className="rounded-2xl border bg-card/40 backdrop-blur-sm px-4 py-4 text-center shadow-sm transition-all hover:bg-card/60 hover:border-primary/20">
+          <div
+            key={s.label}
+            className="rounded-2xl border bg-card/40 backdrop-blur-sm px-4 py-4 text-center shadow-sm transition-all hover:bg-card/60 hover:border-primary/20"
+          >
             <p className="font-display text-2xl font-bold">{s.value}</p>
-            <p className="text-[0.65rem] uppercase tracking-widest text-muted-foreground mt-1">{s.label}</p>
+            <p className="text-[0.65rem] uppercase tracking-widest text-muted-foreground mt-1">
+              {s.label}
+            </p>
           </div>
         ))}
       </div>

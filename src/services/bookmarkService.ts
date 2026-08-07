@@ -7,7 +7,10 @@ const db = supabase as any;
 export async function addBookmark(userId: string, storyId: string): Promise<void> {
   const { error } = await db
     .from("user_bookmarks")
-    .upsert({ user_id: userId, story_id: storyId }, { onConflict: "user_id,story_id", ignoreDuplicates: true });
+    .upsert(
+      { user_id: userId, story_id: storyId },
+      { onConflict: "user_id,story_id", ignoreDuplicates: true },
+    );
   if (error) throw new Error(error.message);
 }
 

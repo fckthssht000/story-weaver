@@ -100,7 +100,11 @@ export function StoryFormDialog({ open, onOpenChange, story, userId, pending, on
             <div className="flex items-start gap-3">
               <div className="relative h-32 w-24 shrink-0 overflow-hidden rounded-md border bg-muted">
                 {cover ? (
-                  <img src={cover} alt="Story cover preview" className="h-full w-full object-cover" />
+                  <img
+                    src={cover}
+                    alt="Story cover preview"
+                    className="h-full w-full object-cover"
+                  />
                 ) : (
                   <div className="flex h-full items-center justify-center text-muted-foreground">
                     <ImagePlus className="size-5" />
@@ -115,7 +119,11 @@ export function StoryFormDialog({ open, onOpenChange, story, userId, pending, on
                   disabled={uploading}
                   onClick={() => fileRef.current?.click()}
                 >
-                  {uploading ? <Loader2 className="size-4 animate-spin" /> : <ImagePlus className="size-4" />}
+                  {uploading ? (
+                    <Loader2 className="size-4 animate-spin" />
+                  ) : (
+                    <ImagePlus className="size-4" />
+                  )}
                   {cover ? "Replace" : "Upload"}
                 </Button>
                 {cover ? (

@@ -19,7 +19,9 @@ export async function downloadStory(storyId: string) {
   if (!story) throw new Error("Story not found");
   const chapters = await fetchChapters(storyId);
 
-  await putLocalStory(toLocalStory(story, story.author?.display_name ?? story.author?.username ?? null));
+  await putLocalStory(
+    toLocalStory(story, story.author?.display_name ?? story.author?.username ?? null),
+  );
   await putLocalChapters(chapters.map(toLocalChapter));
   return { chapters: chapters.length };
 }
@@ -50,7 +52,9 @@ export async function refreshDownload(storyId: string) {
 
   const story = await fetchStory(storyId);
   if (story) {
-    await putLocalStory(toLocalStory(story, story.author?.display_name ?? story.author?.username ?? null));
+    await putLocalStory(
+      toLocalStory(story, story.author?.display_name ?? story.author?.username ?? null),
+    );
   }
   return { updated: staleIds.length };
 }

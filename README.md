@@ -10,14 +10,14 @@ A mobile reader/writer platform where users can publish short stories (or longer
 
 ### 1.1 Stack
 
-| Layer | Technology |
-|---|---|
-| Frontend | React + Vite |
-| Mobile shell | Capacitor (wraps the Vite web app into installable Android/iOS apps) |
-| Remote database | Supabase (Postgres, Auth, Storage) |
-| Local/offline database | SQLite (via `@capacitor-community/sqlite`) |
-| Editor | Tiptap (constrained rich-text, outputs structured JSON/Markdown) |
-| Styling | Tailwind CSS |
+| Layer                  | Technology                                                           |
+| ---------------------- | -------------------------------------------------------------------- |
+| Frontend               | React + Vite                                                         |
+| Mobile shell           | Capacitor (wraps the Vite web app into installable Android/iOS apps) |
+| Remote database        | Supabase (Postgres, Auth, Storage)                                   |
+| Local/offline database | SQLite (via `@capacitor-community/sqlite`)                           |
+| Editor                 | Tiptap (constrained rich-text, outputs structured JSON/Markdown)     |
+| Styling                | Tailwind CSS                                                         |
 
 ### 1.2 High-level diagram
 
@@ -252,6 +252,7 @@ Ask me before making assumptions about UI design — I'll want to review the rea
 ---
 
 ### Notes for using this with an AI coding tool
+
 - Feed it the architecture doc sections (SQL schemas, folder structure) as context alongside the prompt — most tools do better with the schema spelled out rather than referenced.
 - Build in the suggested order (auth → writer → reader online → offline/SQLite → Capacitor) so you can test each layer before adding complexity.
 - The one rule worth enforcing strictly at every step: writer input is structured data, not styled content. That's what makes "auto-layout" real instead of aspirational.

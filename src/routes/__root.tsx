@@ -105,6 +105,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: "https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..600&family=Nunito+Sans:opsz,wght@6..12,300..800&display=swap",
       },
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+      { rel: "apple-touch-icon", href: "/icon.png" },
+      { rel: "manifest", href: "/manifest.webmanifest" },
     ],
   }),
   shellComponent: RootShell,
@@ -265,8 +267,10 @@ function SyncAgent() {
   useEffect(() => {
     const { data: sub } = supabase.auth.onAuthStateChange((event) => {
       if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
-      router.invalidate();
-      if (event !== "SIGNED_OUT") queryClient.invalidateQueries();
+      setTimeout(() => {
+        router.invalidate();
+        if (event !== "SIGNED_OUT") queryClient.invalidateQueries();
+      }, 0);
     });
     return () => sub.subscription.unsubscribe();
   }, [router, queryClient]);
@@ -275,6 +279,7 @@ function SyncAgent() {
     const run = async () => {
       if (document.visibilityState !== "visible") return;
       const { data } = await supabase.auth.getSession();
+      if (!data.session) return;
       await syncProgress(data.session?.user.id ?? null);
       await syncDownloads();
       queryClient.invalidateQueries({ queryKey: ["library"] });
@@ -282,6 +287,16 @@ function SyncAgent() {
     void run();
     document.addEventListener("visibilitychange", run);
     window.addEventListener("online", run);
+
+    // Register Service Worker for PWA
+    if ("serviceWorker" in navigator) {
+      const isDev = import.meta.env.DEV;
+      const swUrl = isDev ? "/dev-sw.js?dev-sw" : "/sw.js";
+      navigator.serviceWorker.register(swUrl, { scope: "/" }).catch((err) => {
+        console.error("Service worker registration failed:", err);
+      });
+    }
+
     return () => {
       document.removeEventListener("visibilitychange", run);
       window.removeEventListener("online", run);

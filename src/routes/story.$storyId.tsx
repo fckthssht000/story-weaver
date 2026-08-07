@@ -1,7 +1,23 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, BookmarkCheck, BookmarkPlus, BookOpen, Check, Download, Heart, Loader2, RefreshCw, Trash2, WifiOff, Play, Share2, PlayCircle, Book } from "lucide-react";
+import {
+  ArrowLeft,
+  BookmarkCheck,
+  BookmarkPlus,
+  BookOpen,
+  Check,
+  Download,
+  Heart,
+  Loader2,
+  RefreshCw,
+  Trash2,
+  WifiOff,
+  Play,
+  Share2,
+  PlayCircle,
+  Book,
+} from "lucide-react";
 import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/hooks/useAuth";
@@ -82,7 +98,9 @@ function StoryDetail() {
           {online ? "This story isn't published." : "You haven't downloaded this story."}
         </p>
         <Button asChild className="mt-6">
-          <Link to="/" search={{ search: "" }}>Browse stories</Link>
+          <Link to="/" search={{ search: "" }}>
+            Browse stories
+          </Link>
         </Button>
       </div>
     );
@@ -137,10 +155,13 @@ function StoryDetail() {
             <Button
               variant="secondary"
               size="icon"
-              className={`rounded-full bg-black/40 text-white hover:bg-black/60 backdrop-blur-sm border-0 ${bookmarked ? 'text-primary' : ''}`}
+              className={`rounded-full bg-black/40 text-white hover:bg-black/60 backdrop-blur-sm border-0 ${bookmarked ? "text-primary" : ""}`}
               disabled={bookmarked ? removeBookmark.isPending : addBookmark.isPending}
               onClick={() => {
-                if (!userId) { navigate({ to: "/auth" }); return; }
+                if (!userId) {
+                  navigate({ to: "/auth" });
+                  return;
+                }
                 if (bookmarked) {
                   removeBookmark.mutate(undefined, {
                     onSuccess: () => toast.success("Removed from Library"),
@@ -167,7 +188,9 @@ function StoryDetail() {
 
         {/* Gradient and Title */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex flex-col justify-end p-4 sm:p-6">
-          <h1 className="font-display text-4xl sm:text-5xl font-bold leading-tight text-white mb-2 max-w-2xl">{title}</h1>
+          <h1 className="font-display text-4xl sm:text-5xl font-bold leading-tight text-white mb-2 max-w-2xl">
+            {title}
+          </h1>
         </div>
       </header>
 
@@ -182,9 +205,7 @@ function StoryDetail() {
           </Avatar>
           <div className="flex-1">
             <p className="font-semibold">{author}</p>
-            <p className="text-[0.8rem] text-muted-foreground mt-0.5">
-              {authorBio}
-            </p>
+            <p className="text-[0.8rem] text-muted-foreground mt-0.5">{authorBio}</p>
           </div>
         </div>
 
@@ -193,8 +214,9 @@ function StoryDetail() {
         {description && (
           <div className="relative">
             <p
-              className={`whitespace-pre-line text-[0.95rem] leading-relaxed text-foreground/90 ${!descExpanded ? "line-clamp-3" : ""
-                }`}
+              className={`whitespace-pre-line text-[0.95rem] leading-relaxed text-foreground/90 ${
+                !descExpanded ? "line-clamp-3" : ""
+              }`}
             >
               {description}
             </p>
@@ -233,7 +255,11 @@ function StoryDetail() {
           <div className="flex-1">
             {downloaded ? (
               <div className="flex gap-2 w-full h-12">
-                <Button variant="secondary" className="flex-1 rounded-xl bg-muted font-medium border border-border" disabled>
+                <Button
+                  variant="secondary"
+                  className="flex-1 rounded-xl bg-muted font-medium border border-border"
+                  disabled
+                >
                   <Check className="size-4 mr-2" /> Downloaded
                 </Button>
                 <Button
@@ -244,18 +270,27 @@ function StoryDetail() {
                   disabled={!online || refresh.isPending}
                   onClick={() =>
                     refresh.mutate(storyId, {
-                      onSuccess: (r) => toast.success(r.updated ? `${r.updated} chapter(s) updated` : "Up to date"),
+                      onSuccess: (r) =>
+                        toast.success(r.updated ? `${r.updated} chapter(s) updated` : "Up to date"),
                     })
                   }
                 >
-                  {refresh.isPending ? <Loader2 className="size-4 animate-spin" /> : <RefreshCw className="size-4 text-muted-foreground" />}
+                  {refresh.isPending ? (
+                    <Loader2 className="size-4 animate-spin" />
+                  ) : (
+                    <RefreshCw className="size-4 text-muted-foreground" />
+                  )}
                 </Button>
                 <Button
                   variant="outline"
                   size="icon"
                   className="rounded-xl h-12 w-12 shrink-0 hover:text-red-500"
                   aria-label="Remove download"
-                  onClick={() => remove.mutate(storyId, { onSuccess: () => toast.success("Removed from offline") })}
+                  onClick={() =>
+                    remove.mutate(storyId, {
+                      onSuccess: () => toast.success("Removed from offline"),
+                    })
+                  }
                 >
                   <Trash2 className="size-4" />
                 </Button>
@@ -288,7 +323,9 @@ function StoryDetail() {
               className="h-12 px-5 rounded-xl bg-muted hover:bg-muted/80 shrink-0"
               onClick={onLike}
             >
-              <Heart className={`size-4 mr-2 ${likes.data?.liked ? "fill-red-500 text-red-500" : ""}`} />
+              <Heart
+                className={`size-4 mr-2 ${likes.data?.liked ? "fill-red-500 text-red-500" : ""}`}
+              />
               {likes.data?.count ?? 0}
             </Button>
           )}
@@ -312,7 +349,11 @@ function StoryDetail() {
           <div className="flex items-start justify-between p-4 sm:p-5 pb-2">
             <div className="flex items-center gap-3">
               <Book className="size-5 text-foreground" />
-              <h2 className="font-display text-xl font-bold leading-tight">Table of<br />Contents ({chapters.data?.length ?? 0})</h2>
+              <h2 className="font-display text-xl font-bold leading-tight">
+                Table of
+                <br />
+                Contents ({chapters.data?.length ?? 0})
+              </h2>
             </div>
           </div>
 
@@ -328,9 +369,13 @@ function StoryDetail() {
                   <div className="flex items-center justify-center size-9 rounded-full bg-accent text-accent-foreground font-semibold text-sm">
                     {i + 1}
                   </div>
-                  <span className="flex-1 text-[0.95rem] font-medium truncate">{c.title || "Untitled chapter"}</span>
+                  <span className="flex-1 text-[0.95rem] font-medium truncate">
+                    {c.title || "Untitled chapter"}
+                  </span>
                   {progress?.chapter_id === c.id ? (
-                    <span className="text-[0.65rem] uppercase tracking-widest text-primary font-bold">Reading</span>
+                    <span className="text-[0.65rem] uppercase tracking-widest text-primary font-bold">
+                      Reading
+                    </span>
                   ) : (
                     <PlayCircle className="size-5 text-muted-foreground opacity-50 group-hover:opacity-100 transition-opacity" />
                   )}

@@ -98,7 +98,7 @@ export function useTTS() {
       setIsPaused(false);
       window.speechSynthesis.speak(utterance);
     },
-    [supported, rate, selectedVoice, voices]
+    [supported, rate, selectedVoice, voices],
   );
 
   const start = useCallback(
@@ -106,7 +106,7 @@ export function useTTS() {
       chunksRef.current = chunks;
       playChunk(startIndex);
     },
-    [playChunk]
+    [playChunk],
   );
 
   const pause = useCallback(() => {

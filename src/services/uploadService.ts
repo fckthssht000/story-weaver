@@ -9,12 +9,7 @@ const MAX_BYTES = 5 * 1024 * 1024;
  * policies). Uses a content-addressed-ish deterministic-per-upload path so a
  * retried upload overwrites instead of piling up orphans.
  */
-export async function uploadMedia(
-  bucket: MediaBucket,
-  userId: string,
-  file: File,
-  scope = "item",
-) {
+export async function uploadMedia(bucket: MediaBucket, userId: string, file: File, scope = "item") {
   if (!file.type.startsWith("image/")) throw new Error("Please choose an image file.");
   if (file.size > MAX_BYTES) throw new Error("Images must be 5 MB or smaller.");
 

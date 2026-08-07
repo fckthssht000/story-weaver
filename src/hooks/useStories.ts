@@ -75,8 +75,12 @@ export function useStoryMutations(userId: string | null) {
   };
 
   const create = useMutation({
-    mutationFn: (input: { title: string; description?: string; genre?: string; cover_url?: string }) =>
-      createStory({ author_id: userId!, ...input }),
+    mutationFn: (input: {
+      title: string;
+      description?: string;
+      genre?: string;
+      cover_url?: string;
+    }) => createStory({ author_id: userId!, ...input }),
     onSuccess: invalidate,
   });
 

@@ -76,15 +76,12 @@ function LibraryPage() {
     <div className="space-y-6">
       <header>
         <h1 className="font-display text-2xl font-semibold">Library</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Your saved and downloaded stories.
-        </p>
+        <p className="mt-1 text-sm text-muted-foreground">Your saved and downloaded stories.</p>
       </header>
 
       {!online ? (
         <p className="flex items-center gap-2 rounded-md bg-accent px-3 py-2 text-xs text-accent-foreground">
-          <WifiOff className="size-3.5" /> Offline — only downloaded stories are
-          available.
+          <WifiOff className="size-3.5" /> Offline — only downloaded stories are available.
         </p>
       ) : null}
 
@@ -103,16 +100,12 @@ function LibraryPage() {
           {userId ? (
             <>
               Open any story and tap{" "}
-              <span className="font-medium text-foreground">Add to Library</span>{" "}
-              or{" "}
+              <span className="font-medium text-foreground">Add to Library</span> or{" "}
               <span className="font-medium text-foreground">Download</span>.
             </>
           ) : (
             <>
-              <Link
-                to="/auth"
-                className="text-primary underline underline-offset-2"
-              >
+              <Link to="/auth" className="text-primary underline underline-offset-2">
                 Sign in
               </Link>{" "}
               to save stories, or download one for offline reading.
@@ -122,12 +115,7 @@ function LibraryPage() {
       ) : (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
           {entries.map((s) => (
-            <Link
-              key={s.id}
-              to="/story/$storyId"
-              params={{ storyId: s.id }}
-              className="group"
-            >
+            <Link key={s.id} to="/story/$storyId" params={{ storyId: s.id }} className="group">
               {/* Cover */}
               <div className="relative aspect-[2/3] overflow-hidden rounded-md bg-accent shadow-sm transition-transform duration-200 group-hover:scale-[1.02]">
                 {s.cover_url ? (
@@ -164,12 +152,8 @@ function LibraryPage() {
               </div>
 
               {/* Title + author */}
-              <p className="mt-1.5 line-clamp-2 text-sm font-semibold leading-snug">
-                {s.title}
-              </p>
-              <p className="mt-0.5 truncate text-xs text-muted-foreground">
-                {s.author}
-              </p>
+              <p className="mt-1.5 line-clamp-2 text-sm font-semibold leading-snug">{s.title}</p>
+              <p className="mt-0.5 truncate text-xs text-muted-foreground">{s.author}</p>
             </Link>
           ))}
         </div>

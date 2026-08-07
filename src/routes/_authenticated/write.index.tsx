@@ -1,6 +1,14 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { MoreHorizontal, Pencil, Plus, Trash2, PenTool, SlidersHorizontal, Clock } from "lucide-react";
+import {
+  MoreHorizontal,
+  Pencil,
+  Plus,
+  Trash2,
+  PenTool,
+  SlidersHorizontal,
+  Clock,
+} from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import { useRealtime } from "@/hooks/useRealtime";
@@ -37,21 +45,36 @@ export const Route = createFileRoute("/_authenticated/write/")({
   component: MyStories,
 });
 
-function StoryListItem({ s, setEditing, setDeleting, update }: { s: any; setEditing: any; setDeleting: any; update: any }) {
+function StoryListItem({
+  s,
+  setEditing,
+  setDeleting,
+  update,
+}: {
+  s: any;
+  setEditing: any;
+  setDeleting: any;
+  update: any;
+}) {
   const [expanded, setExpanded] = useState(false);
 
   return (
     <li className="rounded-2xl border bg-card p-4 flex flex-col gap-4 shadow-sm transition-all">
       <div className="flex gap-4">
         <div className="h-20 w-16 shrink-0 overflow-hidden rounded-md bg-muted border">
-          {s.cover_url && (
-            <img src={s.cover_url} alt="" className="h-full w-full object-cover" />
-          )}
+          {s.cover_url && <img src={s.cover_url} alt="" className="h-full w-full object-cover" />}
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex items-start justify-between">
-            <h3 className="truncate font-display text-[1.1rem] font-bold leading-tight pt-0.5">{s.title}</h3>
-            <Button variant="ghost" size="icon" className="-mt-1.5 -mr-2" onClick={() => setExpanded(!expanded)}>
+            <h3 className="truncate font-display text-[1.1rem] font-bold leading-tight pt-0.5">
+              {s.title}
+            </h3>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="-mt-1.5 -mr-2"
+              onClick={() => setExpanded(!expanded)}
+            >
               <MoreHorizontal className="size-5 text-muted-foreground" />
             </Button>
           </div>
@@ -74,30 +97,49 @@ function StoryListItem({ s, setEditing, setDeleting, update }: { s: any; setEdit
           </p>
         </div>
       </div>
-      
+
       {expanded && (
         <div className="flex gap-1.5 pt-2 border-t mt-1">
-          <Button variant="outline" size="sm" onClick={() => setEditing(s)} className="flex-1 h-9 rounded-xl px-2 min-w-0">
-            <SlidersHorizontal className="size-3.5 mr-1.5 shrink-0 text-muted-foreground" /> 
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setEditing(s)}
+            className="flex-1 h-9 rounded-xl px-2 min-w-0"
+          >
+            <SlidersHorizontal className="size-3.5 mr-1.5 shrink-0 text-muted-foreground" />
             <span className="truncate">Edit</span>
           </Button>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={() => update.mutate({ id: s.id, patch: { status: s.status === 'published' ? 'draft' : 'published' }})}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() =>
+              update.mutate({
+                id: s.id,
+                patch: { status: s.status === "published" ? "draft" : "published" },
+              })
+            }
             className="flex-1 h-9 rounded-xl px-2 min-w-0"
             disabled={update.isPending}
           >
-            <Clock className="size-3.5 mr-1.5 shrink-0 text-muted-foreground" /> 
-            <span className="truncate">{s.status === 'published' ? "Unpublish" : "Publish"}</span>
+            <Clock className="size-3.5 mr-1.5 shrink-0 text-muted-foreground" />
+            <span className="truncate">{s.status === "published" ? "Unpublish" : "Publish"}</span>
           </Button>
-          <Button size="sm" asChild className="flex-1 h-9 rounded-xl bg-zinc-900 text-white hover:bg-zinc-800 px-2 min-w-0">
+          <Button
+            size="sm"
+            asChild
+            className="flex-1 h-9 rounded-xl bg-zinc-900 text-white hover:bg-zinc-800 px-2 min-w-0"
+          >
             <Link to="/write/$storyId" params={{ storyId: s.id }}>
-              <Pencil className="size-3.5 mr-1.5 shrink-0 fill-current" /> 
+              <Pencil className="size-3.5 mr-1.5 shrink-0 fill-current" />
               <span className="truncate">Chapters</span>
             </Link>
           </Button>
-          <Button variant="outline" size="icon" onClick={() => setDeleting(s)} className="h-9 w-9 rounded-xl shrink-0 text-muted-foreground hover:text-red-600">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => setDeleting(s)}
+            className="h-9 w-9 rounded-xl shrink-0 text-muted-foreground hover:text-red-600"
+          >
             <Trash2 className="size-4" />
           </Button>
         </div>
@@ -112,7 +154,10 @@ function MyStories() {
   const stories = useMyStories(userId);
   const { create, update, remove } = useStoryMutations(userId);
 
-  useRealtime(["stories"], { filter: userId ? `author_id=eq.${userId}` : undefined, enabled: !!userId });
+  useRealtime(["stories"], {
+    filter: userId ? `author_id=eq.${userId}` : undefined,
+    enabled: !!userId,
+  });
 
   const [createOpen, setCreateOpen] = useState(false);
   const [editing, setEditing] = useState<Story | null>(null);
@@ -170,7 +215,10 @@ function MyStories() {
             Manage your drafts, edit details, upload cover artwork, and publish story chapters
           </p>
         </div>
-        <Button onClick={() => setCreateOpen(true)} className="shrink-0 bg-zinc-900 text-white rounded-xl shadow-sm hover:bg-zinc-800">
+        <Button
+          onClick={() => setCreateOpen(true)}
+          className="shrink-0 bg-zinc-900 text-white rounded-xl shadow-sm hover:bg-zinc-800"
+        >
           <Plus className="mr-1.5 size-4" /> New
         </Button>
       </header>
@@ -184,12 +232,12 @@ function MyStories() {
       ) : (
         <ul className="flex flex-col gap-4">
           {stories.data.map((s) => (
-            <StoryListItem 
-              key={s.id} 
-              s={s} 
-              setEditing={setEditing} 
-              setDeleting={setDeleting} 
-              update={update} 
+            <StoryListItem
+              key={s.id}
+              s={s}
+              setEditing={setEditing}
+              setDeleting={setDeleting}
+              update={update}
             />
           ))}
         </ul>

@@ -5,7 +5,8 @@ import { EMPTY_DOC } from "@/types";
 
 const STORY_SELECT =
   "id,author_id,title,description,cover_url,status,genre,created_at,updated_at,chapters(count),story_likes(count)";
-const AUTHOR_SELECT = "author:profiles!stories_author_id_fkey(id,username,display_name,avatar_url,bio)";
+const AUTHOR_SELECT =
+  "author:profiles!stories_author_id_fkey(id,username,display_name,avatar_url,bio)";
 
 function unwrap<T>(res: { data: T | null; error: { message: string } | null }): T {
   if (res.error) throw new Error(res.error.message);
@@ -14,8 +15,12 @@ function unwrap<T>(res: { data: T | null; error: { message: string } | null }): 
 
 function mapStory(story: any): StoryWithAuthor {
   if (!story) return story;
-  const chapter_count = Array.isArray(story.chapters) ? story.chapters[0]?.count : story.chapters?.count;
-  const like_count = Array.isArray(story.story_likes) ? story.story_likes[0]?.count : story.story_likes?.count;
+  const chapter_count = Array.isArray(story.chapters)
+    ? story.chapters[0]?.count
+    : story.chapters?.count;
+  const like_count = Array.isArray(story.story_likes)
+    ? story.story_likes[0]?.count
+    : story.story_likes?.count;
   return {
     ...story,
     chapter_count: chapter_count ?? 0,
@@ -43,39 +48,39 @@ export async function fetchPublishedStories(options?: { genre?: string; search?:
 export async function fetchRecentReads(userId: string) {
   const { data, error } = await supabase
     .from("reading_progress")
-    .select(`
+    .select(
+      `
       story_id,
       updated_at,
       story:stories(${STORY_SELECT},${AUTHOR_SELECT})
-    `)
+    `,
+    )
     .eq("user_id", userId)
     .order("updated_at", { ascending: false })
     .limit(10);
 
   if (error) throw new Error(error.message);
-  
+
   // Unwrap the joined story object, filter out any nulls if a story was deleted
-  return data
-    .map((d) => mapStory(d.story))
-    .filter(Boolean);
+  return data.map((d) => mapStory(d.story)).filter(Boolean);
 }
 
 export async function fetchBookmarks(userId: string) {
   const { data, error } = await supabase
     .from("user_bookmarks" as any)
-    .select(`
+    .select(
+      `
       story_id,
       created_at,
       story:stories(${STORY_SELECT},${AUTHOR_SELECT})
-    `)
+    `,
+    )
     .eq("user_id", userId)
     .order("created_at", { ascending: false });
 
   if (error) throw new Error(error.message);
-  
-  return (data as any[])
-    .map((d) => mapStory(d.story))
-    .filter(Boolean);
+
+  return (data as any[]).map((d) => mapStory(d.story)).filter(Boolean);
 }
 
 // Temporary methods for the different sections until we have dedicated backend stats
@@ -87,7 +92,7 @@ export async function fetchDiscoverStories() {
       .select(`${STORY_SELECT},${AUTHOR_SELECT}`)
       .eq("status", "published")
       .order("created_at", { ascending: true })
-      .limit(10)
+      .limit(10),
   ) as any[];
   return data.map(mapStory);
 }
@@ -100,14 +105,18 @@ export async function fetchTopStories() {
       .select(`${STORY_SELECT},${AUTHOR_SELECT}`)
       .eq("status", "published")
       .order("title", { ascending: true })
-      .limit(10)
+      .limit(10),
   ) as any[];
   return data.map(mapStory);
 }
 
 export async function fetchStory(id: string) {
   const data = unwrap(
-    await supabase.from("stories").select(`${STORY_SELECT},${AUTHOR_SELECT}`).eq("id", id).maybeSingle(),
+    await supabase
+      .from("stories")
+      .select(`${STORY_SELECT},${AUTHOR_SELECT}`)
+      .eq("id", id)
+      .maybeSingle(),
   );
   return data ? mapStory(data) : null;
 }
@@ -140,7 +149,9 @@ export async function fetchChapters(storyId: string) {
 }
 
 export async function fetchChapter(chapterId: string) {
-  const data = unwrap(await supabase.from("chapters").select("*").eq("id", chapterId).maybeSingle());
+  const data = unwrap(
+    await supabase.from("chapters").select("*").eq("id", chapterId).maybeSingle(),
+  );
   return (data ?? null) as unknown as Chapter | null;
 }
 
@@ -157,15 +168,18 @@ export async function createStory(input: {
   return unwrap(
     await supabase
       .from("stories")
-      .upsert({
-        id: input.id ?? crypto.randomUUID(),
-        author_id: input.author_id,
-        title: input.title,
-        description: input.description ?? null,
-        genre: input.genre ?? null,
-        cover_url: input.cover_url ?? null,
-        status: "draft",
-      }, { onConflict: "id", ignoreDuplicates: false })
+      .upsert(
+        {
+          id: input.id ?? crypto.randomUUID(),
+          author_id: input.author_id,
+          title: input.title,
+          description: input.description ?? null,
+          genre: input.genre ?? null,
+          cover_url: input.cover_url ?? null,
+          status: "draft",
+        },
+        { onConflict: "id", ignoreDuplicates: false },
+      )
       .select(STORY_SELECT)
       .single(),
   ) as unknown as Story;
@@ -193,14 +207,17 @@ export async function createChapter(
   return unwrap(
     await supabase
       .from("chapters")
-      .upsert({
-        id,
-        story_id: storyId,
-        title,
-        order_index: orderIndex,
-        content: EMPTY_DOC as never,
-        content_hash: contentHash(EMPTY_DOC),
-      }, { onConflict: "id", ignoreDuplicates: false })
+      .upsert(
+        {
+          id,
+          story_id: storyId,
+          title,
+          order_index: orderIndex,
+          content: EMPTY_DOC as never,
+          content_hash: contentHash(EMPTY_DOC),
+        },
+        { onConflict: "id", ignoreDuplicates: false },
+      )
       .select("*")
       .single(),
   ) as unknown as Chapter;
@@ -265,7 +282,10 @@ export async function toggleLike(storyId: string, userId: string, liked: boolean
   } else {
     const { error } = await supabase
       .from("story_likes")
-      .upsert({ story_id: storyId, user_id: userId }, { onConflict: "user_id,story_id", ignoreDuplicates: true });
+      .upsert(
+        { story_id: storyId, user_id: userId },
+        { onConflict: "user_id,story_id", ignoreDuplicates: true },
+      );
     if (error) throw new Error(error.message);
   }
 }

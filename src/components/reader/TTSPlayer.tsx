@@ -1,6 +1,12 @@
 import { X, Play, Pause, SkipBack, SkipForward } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import type { useTTS } from "@/hooks/useTTS";
 
 interface Props {
@@ -91,11 +97,7 @@ export function TTSPlayer({ tts, onClose }: Props) {
                 onClick={tts.isPaused ? tts.resume : tts.pause}
                 aria-label={tts.isPaused ? "Resume reading" : "Pause reading"}
               >
-                {tts.isPaused ? (
-                  <Play className="size-5 ml-1" />
-                ) : (
-                  <Pause className="size-5" />
-                )}
+                {tts.isPaused ? <Play className="size-5 ml-1" /> : <Pause className="size-5" />}
               </Button>
 
               <Button

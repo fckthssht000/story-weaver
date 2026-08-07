@@ -23,11 +23,15 @@ export function SliderStoryCard({ story }: { story: StoryWithAuthor }) {
       )}
 
       {/* Full card hit area */}
-      <Link to="/story/$storyId" params={{ storyId: story.id }} className="absolute inset-0 z-10" aria-label={`View details for ${story.title}`} />
+      <Link
+        to="/story/$storyId"
+        params={{ storyId: story.id }}
+        className="absolute inset-0 z-10"
+        aria-label={`View details for ${story.title}`}
+      />
 
       {/* Content Overlay */}
       <div className="absolute inset-0 z-20 flex flex-col p-4 sm:p-5 bg-gradient-to-t from-black/95 via-black/60 to-black/20 pointer-events-none">
-        
         {/* Top Badges */}
         <div className="flex flex-wrap items-center gap-2 mb-auto">
           {story.genre && (
@@ -52,7 +56,9 @@ export function SliderStoryCard({ story }: { story: StoryWithAuthor }) {
           <div className="flex items-center gap-1.5">
             <Avatar className="h-4 w-4 border border-white/20">
               <AvatarImage src={story.author?.avatar_url || undefined} />
-              <AvatarFallback className="text-[0.4rem] bg-white/20 text-white">{author.charAt(0).toUpperCase()}</AvatarFallback>
+              <AvatarFallback className="text-[0.4rem] bg-white/20 text-white">
+                {author.charAt(0).toUpperCase()}
+              </AvatarFallback>
             </Avatar>
             <span className="truncate max-w-[80px]">{author}</span>
           </div>

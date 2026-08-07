@@ -31,7 +31,10 @@ export function StorySlider({ title, icon, actionText, onAction, stories, loadin
         </div>
         <div className="flex gap-4 overflow-hidden">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="aspect-[4/5] w-[220px] sm:w-[260px] shrink-0 animate-pulse rounded-2xl bg-muted/60" />
+            <div
+              key={i}
+              className="aspect-[4/5] w-[220px] sm:w-[260px] shrink-0 animate-pulse rounded-2xl bg-muted/60"
+            />
           ))}
         </div>
       </section>

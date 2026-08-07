@@ -19,7 +19,10 @@ export const Route = createFileRoute("/_authenticated/settings")({
   head: () => ({
     meta: [
       { title: "Settings — Buklat" },
-      { name: "description", content: "Appearance, reading defaults, sync, offline storage and security." },
+      {
+        name: "description",
+        content: "Appearance, reading defaults, sync, offline storage and security.",
+      },
       { property: "og:title", content: "Settings — Buklat" },
       { property: "og:description", content: "Appearance, reading, sync and security settings." },
     ],
@@ -27,7 +30,15 @@ export const Route = createFileRoute("/_authenticated/settings")({
   component: SettingsPage,
 });
 
-function Section({ title, hint, children }: { title: string; hint?: string; children: React.ReactNode }) {
+function Section({
+  title,
+  hint,
+  children,
+}: {
+  title: string;
+  hint?: string;
+  children: React.ReactNode;
+}) {
   return (
     <section className="space-y-4">
       <div>
@@ -166,7 +177,9 @@ function SettingsPage() {
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <p className="text-sm font-medium">Text size</p>
-            <span className="font-display text-sm text-muted-foreground">{settings.readerSize}px</span>
+            <span className="font-display text-sm text-muted-foreground">
+              {settings.readerSize}px
+            </span>
           </div>
           <Slider
             min={15}
@@ -179,7 +192,9 @@ function SettingsPage() {
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <p className="text-sm font-medium">Line spacing</p>
-            <span className="font-display text-sm text-muted-foreground">{settings.readerLeading}</span>
+            <span className="font-display text-sm text-muted-foreground">
+              {settings.readerLeading}
+            </span>
           </div>
           <Slider
             min={1.4}
@@ -192,7 +207,9 @@ function SettingsPage() {
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <p className="text-sm font-medium">Line width</p>
-            <span className="font-display text-sm text-muted-foreground">{settings.readerWidth}ch</span>
+            <span className="font-display text-sm text-muted-foreground">
+              {settings.readerWidth}ch
+            </span>
           </div>
           <Slider
             min={45}
@@ -226,7 +243,10 @@ function SettingsPage() {
           />
         </Row>
         <Separator />
-        <Row label="Auto-download on read" description="Keep every story you open available offline.">
+        <Row
+          label="Auto-download on read"
+          description="Keep every story you open available offline."
+        >
           <Switch
             checked={settings.autoDownloadOnRead}
             onCheckedChange={(v) => update({ autoDownloadOnRead: v })}
@@ -295,7 +315,12 @@ function SettingsPage() {
         <div className="space-y-1.5">
           <Label htmlFor="email">Email address</Label>
           <div className="flex gap-2">
-            <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+            <Input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
             <Button variant="outline" onClick={changeEmail} disabled={busy === "email"}>
               {busy === "email" ? <Loader2 className="size-4 animate-spin" /> : null}
               Update

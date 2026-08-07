@@ -17,7 +17,7 @@ import { Sparkles, BookOpen, Clock, Flame, Compass, TrendingUp } from "lucide-re
 import { GENRES } from "@/types";
 import { cn } from "@/lib/utils";
 
-export const Route = createFileRoute("/")(({
+export const Route = createFileRoute("/")({
   validateSearch: (search: Record<string, unknown>): { search?: string } => {
     const s = typeof search["search"] === "string" ? search["search"] : undefined;
     return s !== undefined ? { search: s } : {};
@@ -38,7 +38,7 @@ export const Route = createFileRoute("/")(({
     ],
   }),
   component: Home,
-}));
+});
 
 function Home() {
   const { search: searchParam } = Route.useSearch();
@@ -78,7 +78,10 @@ function Home() {
               {stories.data.slice(0, 5).map((story) => {
                 const author = story.author?.display_name ?? story.author?.username ?? "Unknown";
                 return (
-                  <CarouselItem key={story.id} className="pl-0 sm:pl-4 basis-[85%] sm:basis-[60%] md:basis-[45%] lg:basis-[35%] mr-3 sm:mr-0">
+                  <CarouselItem
+                    key={story.id}
+                    className="pl-0 sm:pl-4 basis-[85%] sm:basis-[60%] md:basis-[45%] lg:basis-[35%] mr-3 sm:mr-0"
+                  >
                     <div className="group relative aspect-[4/5] sm:aspect-[3/4] overflow-hidden rounded-2xl bg-muted border border-border/10 shadow-lg">
                       {story.cover_url ? (
                         <img
@@ -95,11 +98,15 @@ function Home() {
                       )}
 
                       {/* Full card hit area for View Details */}
-                      <Link to="/story/$storyId" params={{ storyId: story.id }} className="absolute inset-0 z-10" aria-label={`View details for ${story.title}`} />
+                      <Link
+                        to="/story/$storyId"
+                        params={{ storyId: story.id }}
+                        className="absolute inset-0 z-10"
+                        aria-label={`View details for ${story.title}`}
+                      />
 
                       {/* Content Overlay */}
                       <div className="absolute inset-0 z-20 flex flex-col p-5 sm:p-6 bg-gradient-to-t from-black/95 via-black/60 to-black/20 pointer-events-none">
-
                         {/* Top Badges */}
                         <div className="flex flex-wrap items-center gap-2 mb-auto">
                           <div className="flex items-center gap-1.5 bg-white text-black px-2.5 py-1 rounded-full text-[0.65rem] font-bold tracking-[0.05em] uppercase">
@@ -131,7 +138,10 @@ function Home() {
                             search={{ chapter: undefined }}
                             className="flex-1"
                           >
-                            <Button variant="secondary" className="w-full bg-white text-black hover:bg-white/90 font-semibold rounded-xl h-10">
+                            <Button
+                              variant="secondary"
+                              className="w-full bg-white text-black hover:bg-white/90 font-semibold rounded-xl h-10"
+                            >
                               <BookOpen className="w-4 h-4 mr-2" />
                               Read Story
                             </Button>
@@ -141,12 +151,14 @@ function Home() {
                             params={{ storyId: story.id }}
                             className="flex-1"
                           >
-                            <Button variant="outline" className="w-full bg-black/50 text-white border-white/20 hover:bg-black/70 hover:text-white font-semibold rounded-xl h-10">
+                            <Button
+                              variant="outline"
+                              className="w-full bg-black/50 text-white border-white/20 hover:bg-black/70 hover:text-white font-semibold rounded-xl h-10"
+                            >
                               View Details
                             </Button>
                           </Link>
                         </div>
-
                       </div>
                     </div>
                   </CarouselItem>
@@ -223,15 +235,15 @@ function Home() {
           {/* Popular Genres Sliders */}
           <StorySlider
             title="Top in Fantasy"
-            stories={stories.data?.filter(s => s.genre === 'Fantasy')}
+            stories={stories.data?.filter((s) => s.genre === "Fantasy")}
           />
           <StorySlider
             title="Top in Sci-Fi"
-            stories={stories.data?.filter(s => s.genre === 'Sci-Fi')}
+            stories={stories.data?.filter((s) => s.genre === "Sci-Fi")}
           />
           <StorySlider
             title="Top in Mystery"
-            stories={stories.data?.filter(s => s.genre === 'Mystery')}
+            stories={stories.data?.filter((s) => s.genre === "Mystery")}
           />
         </div>
       )}

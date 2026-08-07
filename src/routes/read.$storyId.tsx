@@ -211,11 +211,7 @@ function Reader() {
                   {words.toLocaleString()} words · {readingMinutes(words)} min read
                 </p>
                 <div className="flex items-center justify-between gap-3">
-                  <Button
-                    variant="outline"
-                    disabled={index === 0}
-                    onClick={() => goto(index - 1)}
-                  >
+                  <Button variant="outline" disabled={index === 0} onClick={() => goto(index - 1)}>
                     <ChevronLeft className="size-4" /> Previous
                   </Button>
                   <Button disabled={index >= list.length - 1} onClick={() => goto(index + 1)}>
