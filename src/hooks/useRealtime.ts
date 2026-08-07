@@ -12,7 +12,12 @@ type Table = "stories" | "chapters" | "profiles" | "story_likes";
  */
 export function useRealtime(
   tables: Table[],
-  options: { filter?: string; enabled?: boolean; keys?: string[][]; channel?: string } = {},
+  options: {
+    filter?: string | undefined;
+    enabled?: boolean | undefined;
+    keys?: string[][] | undefined;
+    channel?: string | undefined;
+  } = {},
 ) {
   const qc = useQueryClient();
   const { settings } = useSettings();
