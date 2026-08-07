@@ -69,6 +69,7 @@ export async function fetchChapter(chapterId: string) {
 /* ---------- story writes ---------- */
 
 export async function createStory(input: {
+  id?: string;
   author_id: string;
   title: string;
   description?: string | null;
@@ -78,14 +79,15 @@ export async function createStory(input: {
   return unwrap(
     await supabase
       .from("stories")
-      .insert({
+      .upsert({
+        id: input.id ?? crypto.randomUUID(),
         author_id: input.author_id,
         title: input.title,
         description: input.description ?? null,
         genre: input.genre ?? null,
         cover_url: input.cover_url ?? null,
         status: "draft",
-      })
+      }, { onConflict: "id", ignoreDuplicates: false })
       .select(STORY_SELECT)
       .single(),
   ) as unknown as Story;
@@ -104,17 +106,23 @@ export async function deleteStory(id: string) {
 
 /* ---------- chapter writes ---------- */
 
-export async function createChapter(storyId: string, title: string, orderIndex: number) {
+export async function createChapter(
+  storyId: string,
+  title: string,
+  orderIndex: number,
+  id: string = crypto.randomUUID(),
+) {
   return unwrap(
     await supabase
       .from("chapters")
-      .insert({
+      .upsert({
+        id,
         story_id: storyId,
         title,
         order_index: orderIndex,
         content: EMPTY_DOC as never,
         content_hash: contentHash(EMPTY_DOC),
-      })
+      }, { onConflict: "id", ignoreDuplicates: false })
       .select("*")
       .single(),
   ) as unknown as Chapter;
@@ -177,7 +185,9 @@ export async function toggleLike(storyId: string, userId: string, liked: boolean
       .eq("user_id", userId);
     if (error) throw new Error(error.message);
   } else {
-    const { error } = await supabase.from("story_likes").insert({ story_id: storyId, user_id: userId });
+    const { error } = await supabase
+      .from("story_likes")
+      .upsert({ story_id: storyId, user_id: userId }, { onConflict: "user_id,story_id", ignoreDuplicates: true });
     if (error) throw new Error(error.message);
   }
 }
