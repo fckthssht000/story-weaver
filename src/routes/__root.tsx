@@ -133,11 +133,13 @@ const TABS = [
 function Chrome() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const immersive = pathname.startsWith("/read/");
+  // The chapter editor replaces the bottom nav with its own sticky toolbar.
+  const editing = /^\/write\/.+/.test(pathname);
 
   if (immersive) return <Outlet />;
 
   return (
-    <div className="min-h-screen pb-20">
+    <div className={cn("min-h-screen", editing ? "pb-16 sm:pb-6" : "pb-20")}>
       <header className="sticky top-0 z-30 border-b bg-background/85 backdrop-blur">
         <div className="mx-auto flex h-14 max-w-3xl items-center justify-between px-4">
           <Link to="/" className="font-display text-lg font-bold tracking-tight">
@@ -163,6 +165,7 @@ function Chrome() {
         <Outlet />
       </main>
 
+      {editing ? null : (
       <nav className="fixed inset-x-0 bottom-0 z-30 border-t bg-background/95 backdrop-blur sm:hidden">
         <div className="mx-auto flex max-w-3xl">
           {TABS.map((t) => (
@@ -183,6 +186,7 @@ function Chrome() {
           ))}
         </div>
       </nav>
+      )}
     </div>
   );
 }
