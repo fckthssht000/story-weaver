@@ -35,9 +35,9 @@ import { EMPTY_DOC, type DocNode } from "@/types";
 export const Route = createFileRoute("/_authenticated/write/$storyId")({
   head: () => ({
     meta: [
-      { title: "Editor — StoryApp" },
+      { title: "Editor — Buklat" },
       { name: "description", content: "Write chapters in a constrained, structure-only editor." },
-      { property: "og:title", content: "Editor — StoryApp" },
+      { property: "og:title", content: "Editor — Buklat" },
       { property: "og:description", content: "Write chapters in a structure-only editor." },
     ],
   }),
@@ -193,8 +193,8 @@ function Editor() {
   );
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center gap-1.5">
+    <div className="space-y-0">
+      <div className="sticky top-14 z-20 flex items-center gap-1.5 bg-background/95 py-2 backdrop-blur">
         <Button variant="ghost" size="icon" asChild aria-label="Back to my stories">
           <Link to="/write">
             <ArrowLeft className="size-4" />
@@ -264,7 +264,7 @@ function Editor() {
         <section className="space-y-3">
           {activeId ? (
             <>
-              <div className="sticky top-14 z-20 flex gap-2 bg-background/95 py-2 backdrop-blur">
+              <div className="sticky top-[6.75rem] z-10 flex gap-2 bg-background/95 py-2 backdrop-blur">
                 <Input
                   value={title}
                   onChange={(e) => {

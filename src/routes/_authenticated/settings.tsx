@@ -18,9 +18,9 @@ import type { AppTheme, ReaderTheme } from "@/lib/settings";
 export const Route = createFileRoute("/_authenticated/settings")({
   head: () => ({
     meta: [
-      { title: "Settings — StoryApp" },
+      { title: "Settings — Buklat" },
       { name: "description", content: "Appearance, reading defaults, sync, offline storage and security." },
-      { property: "og:title", content: "Settings — StoryApp" },
+      { property: "og:title", content: "Settings — Buklat" },
       { property: "og:description", content: "Appearance, reading, sync and security settings." },
     ],
   }),

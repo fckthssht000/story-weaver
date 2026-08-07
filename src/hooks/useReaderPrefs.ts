@@ -1,10 +1,11 @@
 import { useSettings } from "@/hooks/useSettings";
-import type { ReaderTheme } from "@/lib/settings";
+import type { ReaderTheme, ReaderFont } from "@/lib/settings";
 
-export type { ReaderTheme };
+export type { ReaderTheme, ReaderFont };
 
 export interface ReaderPrefs {
   theme: ReaderTheme;
+  font: ReaderFont;
   size: number;
   leading: number;
   width: number;
@@ -13,6 +14,7 @@ export interface ReaderPrefs {
 
 export const DEFAULT_PREFS: ReaderPrefs = {
   theme: "paper",
+  font: "serif",
   size: 18,
   leading: 1.75,
   width: 62,
@@ -25,6 +27,7 @@ export function useReaderPrefs() {
 
   const prefs: ReaderPrefs = {
     theme: settings.readerTheme,
+    font: settings.readerFont,
     size: settings.readerSize,
     leading: settings.readerLeading,
     width: settings.readerWidth,
@@ -34,6 +37,7 @@ export function useReaderPrefs() {
   const update = (patch: Partial<ReaderPrefs>) =>
     updateSettings({
       ...(patch.theme !== undefined ? { readerTheme: patch.theme } : {}),
+      ...(patch.font !== undefined ? { readerFont: patch.font } : {}),
       ...(patch.size !== undefined ? { readerSize: patch.size } : {}),
       ...(patch.leading !== undefined ? { readerLeading: patch.leading } : {}),
       ...(patch.width !== undefined ? { readerWidth: patch.width } : {}),

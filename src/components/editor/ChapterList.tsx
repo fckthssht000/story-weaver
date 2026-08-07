@@ -21,7 +21,7 @@ export function ChapterList({ chapters, activeId, onSelect, onMove, onDelete }: 
   }
 
   return (
-    <ul className="space-y-1">
+    <ul className="max-h-[min(60vh,28rem)] space-y-1 overflow-y-auto pr-0.5">
       {chapters.map((c, i) => (
         <li
           key={c.id}

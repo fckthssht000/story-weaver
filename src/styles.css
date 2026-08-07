@@ -5,7 +5,7 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * StoryApp design system — "literary serif".
+ * Buklat design system — "literary serif".
  * Warm paper surfaces, Lora display, Nunito Sans UI/body.
  * All colours are oklch tokens. Never hardcode colours in components.
  */

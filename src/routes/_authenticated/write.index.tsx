@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { MoreVertical, Pencil, Plus, Trash2 } from "lucide-react";
+import { MoreHorizontal, Pencil, Plus, Trash2, PenTool, SlidersHorizontal, Clock } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import { useRealtime } from "@/hooks/useRealtime";
@@ -28,14 +28,83 @@ import type { Story } from "@/types";
 export const Route = createFileRoute("/_authenticated/write/")({
   head: () => ({
     meta: [
-      { title: "My stories — StoryApp" },
+      { title: "My stories — Buklat" },
       { name: "description", content: "Draft, edit and publish your stories." },
-      { property: "og:title", content: "My stories — StoryApp" },
+      { property: "og:title", content: "My stories — Buklat" },
       { property: "og:description", content: "Draft, edit and publish your stories." },
     ],
   }),
   component: MyStories,
 });
+
+function StoryListItem({ s, setEditing, setDeleting, update }: { s: any; setEditing: any; setDeleting: any; update: any }) {
+  const [expanded, setExpanded] = useState(false);
+
+  return (
+    <li className="rounded-2xl border bg-card p-4 flex flex-col gap-4 shadow-sm transition-all">
+      <div className="flex gap-4">
+        <div className="h-20 w-16 shrink-0 overflow-hidden rounded-md bg-muted border">
+          {s.cover_url && (
+            <img src={s.cover_url} alt="" className="h-full w-full object-cover" />
+          )}
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="flex items-start justify-between">
+            <h3 className="truncate font-display text-[1.1rem] font-bold leading-tight pt-0.5">{s.title}</h3>
+            <Button variant="ghost" size="icon" className="-mt-1.5 -mr-2" onClick={() => setExpanded(!expanded)}>
+              <MoreHorizontal className="size-5 text-muted-foreground" />
+            </Button>
+          </div>
+          <span
+            className={
+              s.status === "published"
+                ? "inline-block mt-1.5 rounded bg-emerald-100/80 px-2 py-0.5 text-[0.6rem] font-bold uppercase tracking-widest text-emerald-700"
+                : "inline-block mt-1.5 rounded bg-muted px-2 py-0.5 text-[0.6rem] font-bold uppercase tracking-widest text-muted-foreground"
+            }
+          >
+            {s.status}
+          </span>
+          {s.description && (
+            <p className="mt-1.5 text-[0.8rem] text-muted-foreground line-clamp-1">
+              {s.description}
+            </p>
+          )}
+          <p className="mt-1 text-[0.7rem] text-muted-foreground font-medium">
+            {s.genre || "No genre"} &bull; {s.chapter_count ?? 0} chapters
+          </p>
+        </div>
+      </div>
+      
+      {expanded && (
+        <div className="flex gap-1.5 pt-2 border-t mt-1">
+          <Button variant="outline" size="sm" onClick={() => setEditing(s)} className="flex-1 h-9 rounded-xl px-2 min-w-0">
+            <SlidersHorizontal className="size-3.5 mr-1.5 shrink-0 text-muted-foreground" /> 
+            <span className="truncate">Edit</span>
+          </Button>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => update.mutate({ id: s.id, patch: { status: s.status === 'published' ? 'draft' : 'published' }})}
+            className="flex-1 h-9 rounded-xl px-2 min-w-0"
+            disabled={update.isPending}
+          >
+            <Clock className="size-3.5 mr-1.5 shrink-0 text-muted-foreground" /> 
+            <span className="truncate">{s.status === 'published' ? "Unpublish" : "Publish"}</span>
+          </Button>
+          <Button size="sm" asChild className="flex-1 h-9 rounded-xl bg-zinc-900 text-white hover:bg-zinc-800 px-2 min-w-0">
+            <Link to="/write/$storyId" params={{ storyId: s.id }}>
+              <Pencil className="size-3.5 mr-1.5 shrink-0 fill-current" /> 
+              <span className="truncate">Chapters</span>
+            </Link>
+          </Button>
+          <Button variant="outline" size="icon" onClick={() => setDeleting(s)} className="h-9 w-9 rounded-xl shrink-0 text-muted-foreground hover:text-red-600">
+            <Trash2 className="size-4" />
+          </Button>
+        </div>
+      )}
+    </li>
+  );
+}
 
 function MyStories() {
   const { userId } = useAuth();
@@ -94,13 +163,15 @@ function MyStories() {
     <div className="space-y-6">
       <header className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="font-display text-2xl font-semibold">My stories</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Write the words; the reader handles the layout.
+          <h1 className="font-display text-2xl font-bold flex items-center gap-2">
+            <PenTool className="size-5" /> Writer Studio
+          </h1>
+          <p className="mt-1 text-[0.85rem] text-muted-foreground max-w-[280px] leading-snug">
+            Manage your drafts, edit details, upload cover artwork, and publish story chapters
           </p>
         </div>
-        <Button onClick={() => setCreateOpen(true)}>
-          <Plus className="size-4" /> New
+        <Button onClick={() => setCreateOpen(true)} className="shrink-0 bg-zinc-900 text-white rounded-xl shadow-sm hover:bg-zinc-800">
+          <Plus className="mr-1.5 size-4" /> New
         </Button>
       </header>
 
@@ -111,54 +182,15 @@ function MyStories() {
           No stories yet. Start one above.
         </p>
       ) : (
-        <ul className="divide-y rounded-lg border bg-card">
+        <ul className="flex flex-col gap-4">
           {stories.data.map((s) => (
-            <li key={s.id} className="flex items-center gap-2 pr-2">
-              <Link
-                to="/write/$storyId"
-                params={{ storyId: s.id }}
-                className="flex min-w-0 flex-1 items-center gap-3 px-4 py-3 transition-colors hover:bg-muted"
-              >
-                <div className="h-14 w-10 shrink-0 overflow-hidden rounded border bg-muted">
-                  {s.cover_url ? (
-                    <img src={s.cover_url} alt="" className="h-full w-full object-cover" />
-                  ) : null}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="truncate font-display text-base font-semibold">{s.title}</p>
-                  <p className="mt-0.5 text-xs text-muted-foreground">
-                    Updated {new Date(s.updated_at).toLocaleDateString()}
-                  </p>
-                </div>
-                <span
-                  className={
-                    s.status === "published"
-                      ? "rounded-full bg-primary/10 px-2 py-0.5 text-[0.65rem] uppercase tracking-wider text-primary"
-                      : "rounded-full bg-muted px-2 py-0.5 text-[0.65rem] uppercase tracking-wider text-muted-foreground"
-                  }
-                >
-                  {s.status}
-                </span>
-              </Link>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" aria-label={`Options for ${s.title}`}>
-                    <MoreVertical className="size-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onSelect={() => setEditing(s)}>
-                    <Pencil className="size-4" /> Edit details
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    className="text-destructive"
-                    onSelect={() => setDeleting(s)}
-                  >
-                    <Trash2 className="size-4" /> Delete story
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </li>
+            <StoryListItem 
+              key={s.id} 
+              s={s} 
+              setEditing={setEditing} 
+              setDeleting={setDeleting} 
+              update={update} 
+            />
           ))}
         </ul>
       )}

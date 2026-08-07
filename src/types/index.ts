@@ -22,7 +22,9 @@ export interface Story {
 }
 
 export interface StoryWithAuthor extends Story {
-  author: Pick<Profile, "id" | "username" | "display_name" | "avatar_url"> | null;
+  author: Pick<Profile, "id" | "username" | "display_name" | "avatar_url" | "bio"> | null;
+  chapter_count?: number;
+  like_count?: number;
 }
 
 /** Constrained Tiptap document. Structure only — never styles. */

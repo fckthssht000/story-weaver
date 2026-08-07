@@ -4,6 +4,7 @@
  * Settings page immediately affects the reader, sync and editor behaviour.
  */
 export type ReaderTheme = "paper" | "sepia" | "night";
+export type ReaderFont = "serif" | "sans" | "dyslexic";
 export type AppTheme = "light" | "dark" | "system";
 
 export interface AppSettings {
@@ -11,6 +12,7 @@ export interface AppSettings {
   appTheme: AppTheme;
   /* reader */
   readerTheme: ReaderTheme;
+  readerFont: ReaderFont;
   readerSize: number;
   readerLeading: number;
   readerWidth: number;
@@ -27,6 +29,7 @@ export interface AppSettings {
 export const DEFAULT_SETTINGS: AppSettings = {
   appTheme: "system",
   readerTheme: "paper",
+  readerFont: "serif",
   readerSize: 18,
   readerLeading: 1.75,
   readerWidth: 62,
@@ -38,7 +41,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   autosaveDelay: 2000,
 };
 
-const KEY = "storyapp.settings.v1";
+const KEY = "Buklat.settings.v1";
 
 let state: AppSettings = DEFAULT_SETTINGS;
 let hydrated = false;

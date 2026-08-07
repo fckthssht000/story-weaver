@@ -1,6 +1,6 @@
 # Story Weaver
 
-# StoryApp — AI Build Prompt & Architecture Document
+# Buklat — AI Build Prompt & Architecture Document
 
 A mobile reader/writer platform where users can publish short stories (or longer works), and readers can browse, read, and download stories for offline access. Content is auto-formatted on the reader side so writers don't need to worry about layout.
 
@@ -153,7 +153,7 @@ Writers never control typography. The editor only outputs a constrained structur
 ## 2. Project Structure
 
 ```
-storyapp/
+Buklat/
 ├── capacitor.config.ts
 ├── vite.config.ts
 ├── tailwind.config.js
@@ -216,7 +216,7 @@ storyapp/
 Copy everything in the box below into your AI coding tool (Claude Code, Cursor, etc.) as the initial project prompt.
 
 ```
-I'm building "StoryApp" — a mobile app where users can be both readers and writers of short stories and long-form fiction. Build this as a React + Vite web app wrapped with Capacitor for Android/iOS.
+I'm building "Buklat" — a mobile app where users can be both readers and writers of short stories and long-form fiction. Build this as a React + Vite web app wrapped with Capacitor for Android/iOS.
 
 STACK
 - Frontend: React + Vite + TypeScript + Tailwind CSS

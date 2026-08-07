@@ -1,7 +1,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import { renderContent } from "@/lib/contentRenderer";
 import type { DocNode } from "@/types";
-import type { ReaderPrefs } from "@/hooks/useReaderPrefs";
+import type { ReaderPrefs, ReaderFont } from "@/hooks/useReaderPrefs";
 
 interface Props {
   title?: string | null | undefined;
@@ -16,10 +16,18 @@ interface Props {
  * everything visual is decided here.
  */
 export function ReaderView({ title, storyTitle, content, prefs, footer }: Props) {
+  const fontMap: Record<ReaderFont, string> = {
+    serif: '"Lora", Georgia, serif',
+    sans: '"Nunito Sans", ui-sans-serif, system-ui, sans-serif',
+    dyslexic: 'OpenDyslexic, Lexend, "Comic Sans MS", sans-serif',
+  };
+
   const style = {
     "--reader-size": `${prefs.size}px`,
     "--reader-leading": String(prefs.leading),
+    "--font-reading": fontMap[prefs.font],
     maxWidth: `${prefs.width}ch`,
+    textAlign: prefs.justify ? "justify" : "left",
   } as CSSProperties;
 
   return (

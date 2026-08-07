@@ -84,6 +84,29 @@ export function docToText(doc: DocNode | null | undefined): string {
   return out.replace(/\s+/g, " ").trim();
 }
 
+/** Extracts an array of text chunks (one per block element) for Text-to-Speech playback. */
+export function docToChunks(doc: DocNode | null | undefined): string[] {
+  if (!doc) return [];
+  const chunks: string[] = [];
+  
+  const walk = (n: DocNode) => {
+    if (["paragraph", "heading", "blockquote", "listItem"].includes(n.type)) {
+      const text = docToText(n);
+      if (text) chunks.push(text);
+    } else if (n.content && n.type !== "doc") {
+      // If it's not a block-level node but has content, process its children.
+      // (Actually, docToText on the block node already does this, so we only 
+      // need to walk 'doc' or unknown wrappers)
+      n.content.forEach(walk);
+    } else if (n.type === "doc" && n.content) {
+      n.content.forEach(walk);
+    }
+  };
+  
+  walk(doc);
+  return chunks;
+}
+
 export function wordCount(doc: DocNode | null | undefined): number {
   const text = docToText(doc);
   return text ? text.split(" ").length : 0;

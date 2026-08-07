@@ -22,8 +22,8 @@ export function ReaderSettings({ prefs, onChange }: Props) {
           <Type className="size-4" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent align="end" className="w-64">
-        <div className="space-y-4">
+      <PopoverContent align="end" className="w-72">
+        <div className="space-y-5">
           <div>
             <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               Text size
@@ -62,6 +62,64 @@ export function ReaderSettings({ prefs, onChange }: Props) {
                   onClick={() => onChange({ leading: l })}
                 >
                   {l === 1.55 ? "Tight" : l === 1.75 ? "Normal" : "Airy"}
+                </Button>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              Width
+            </p>
+            <div className="grid grid-cols-3 gap-1.5">
+              {[50, 62, 75].map((w) => (
+                <Button
+                  key={w}
+                  variant={prefs.width === w ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => onChange({ width: w })}
+                >
+                  {w === 50 ? "Narrow" : w === 62 ? "Normal" : "Wide"}
+                </Button>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              Alignment
+            </p>
+            <div className="grid grid-cols-2 gap-1.5">
+              {[false, true].map((j) => (
+                <Button
+                  key={String(j)}
+                  variant={prefs.justify === j ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => onChange({ justify: j })}
+                >
+                  {j ? "Justify" : "Left"}
+                </Button>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              Font
+            </p>
+            <div className="grid grid-cols-3 gap-1.5">
+              {[
+                { id: "serif", label: "Serif" },
+                { id: "sans", label: "Sans" },
+                { id: "dyslexic", label: "Dyslexic" },
+              ].map((f) => (
+                <Button
+                  key={f.id}
+                  variant={prefs.font === f.id ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => onChange({ font: f.id as any })}
+                >
+                  {f.label}
                 </Button>
               ))}
             </div>

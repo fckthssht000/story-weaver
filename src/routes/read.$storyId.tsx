@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ArrowLeft, ChevronLeft, ChevronRight, List } from "lucide-react";
+import { ArrowLeft, ChevronLeft, ChevronRight, Headphones, List } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useChapters } from "@/hooks/useChapters";
 import { useNetworkStatus } from "@/hooks/useNetworkStatus";
@@ -9,9 +9,12 @@ import { useReadingProgress } from "@/hooks/useReadingProgress";
 import { useStory } from "@/hooks/useStories";
 import { ReaderView } from "@/components/reader/ReaderView";
 import { ReaderSettings } from "@/components/reader/ReaderSettings";
+import { TTSPlayer } from "@/components/reader/TTSPlayer";
 import { ProgressBar } from "@/components/reader/ProgressBar";
 import { Button } from "@/components/ui/button";
-import { readingMinutes, wordCount } from "@/lib/contentRenderer";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { docToChunks, readingMinutes, wordCount } from "@/lib/contentRenderer";
+import { useTTS } from "@/hooks/useTTS";
 
 export const Route = createFileRoute("/read/$storyId")({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -19,9 +22,9 @@ export const Route = createFileRoute("/read/$storyId")({
   }),
   head: () => ({
     meta: [
-      { title: "Reading — StoryApp" },
+      { title: "Reading — Buklat" },
       { name: "description", content: "A distraction-free, auto-formatted reading view." },
-      { property: "og:title", content: "Reading — StoryApp" },
+      { property: "og:title", content: "Reading — Buklat" },
       { property: "og:description", content: "A distraction-free, auto-formatted reading view." },
     ],
   }),
@@ -41,6 +44,7 @@ function Reader() {
   const { progress, record } = useReadingProgress(storyId, userId);
 
   const [ratio, setRatio] = useState(0);
+  const [isChapterListOpen, setIsChapterListOpen] = useState(false);
   const restored = useRef(false);
 
   const list = useMemo(() => chapters.data ?? [], [chapters.data]);
@@ -49,6 +53,17 @@ function Reader() {
     list.findIndex((c) => c.id === (chapterParam ?? progress?.chapter_id ?? list[0]?.id)),
   );
   const current = list[index];
+
+  const tts = useTTS();
+
+  const onListen = () => {
+    if (tts.isPlaying || tts.isPaused) {
+      tts.stop();
+    } else {
+      const chunks = docToChunks(current?.content ?? null);
+      if (chunks.length > 0) tts.start(chunks);
+    }
+  };
 
   useEffect(() => {
     if (!chapterParam && current) {
@@ -88,6 +103,7 @@ function Reader() {
   useEffect(() => {
     window.scrollTo({ top: 0 });
     setRatio(0);
+    tts.stop();
   }, [chapterParam]);
 
   const goto = (i: number) => {
@@ -102,21 +118,71 @@ function Reader() {
     <div className={`reader-theme-${prefs.theme} reader-surface min-h-screen`}>
       <div className="fixed inset-x-0 top-0 z-40">
         <div className="reader-surface/95 flex h-14 items-center justify-between border-b border-[var(--reader-rule)] bg-[var(--reader-bg)] px-3">
-          <Button variant="ghost" size="icon" asChild aria-label="Back to story">
-            <Link to="/story/$storyId" params={{ storyId }}>
-              <ArrowLeft className="size-4" />
-            </Link>
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label="Back to story"
+            onClick={() => {
+              if (window.history.length > 1) {
+                window.history.back();
+              } else {
+                navigate({ to: "/story/$storyId", params: { storyId } });
+              }
+            }}
+          >
+            <ArrowLeft className="size-4" />
           </Button>
           <p className="truncate px-2 text-xs text-[var(--reader-soft)]">
             {story.data?.title ?? ""}
             {list.length ? ` · ${index + 1}/${list.length}` : ""}
           </p>
           <div className="flex items-center">
-            <Button variant="ghost" size="icon" asChild aria-label="Chapter list">
-              <Link to="/story/$storyId" params={{ storyId }}>
-                <List className="size-4" />
-              </Link>
-            </Button>
+            {tts.supported ? (
+              <Button
+                variant={tts.isPlaying || tts.isPaused ? "default" : "ghost"}
+                size="icon"
+                aria-label="Listen to chapter"
+                onClick={onListen}
+              >
+                <Headphones className="size-4" />
+              </Button>
+            ) : null}
+            <Sheet open={isChapterListOpen} onOpenChange={setIsChapterListOpen}>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon" aria-label="Chapter list">
+                  <List className="size-4" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-80 flex flex-col p-0 sm:max-w-sm">
+                <SheetHeader className="p-4 border-b">
+                  <SheetTitle className="text-left font-display">Chapters</SheetTitle>
+                </SheetHeader>
+                <div className="flex-1 overflow-y-auto">
+                  {list.map((ch, i) => (
+                    <Button
+                      key={ch.id}
+                      variant="ghost"
+                      className={`w-full justify-start rounded-none px-4 py-3 h-auto text-left ${i === index ? "bg-accent" : ""}`}
+                      onClick={() => {
+                        goto(i);
+                        setIsChapterListOpen(false);
+                      }}
+                    >
+                      <div className="flex flex-col items-start gap-1">
+                        <span className="font-medium text-sm leading-tight">
+                          {i + 1}. {ch.title}
+                        </span>
+                        {i === index && (
+                          <span className="text-xs text-primary font-semibold tracking-wider">
+                            READING
+                          </span>
+                        )}
+                      </div>
+                    </Button>
+                  ))}
+                </div>
+              </SheetContent>
+            </Sheet>
             <ReaderSettings prefs={prefs} onChange={update} />
           </div>
         </div>
@@ -161,6 +227,8 @@ function Reader() {
           />
         )}
       </div>
+      {/* Floating TTS Player */}
+      <TTSPlayer tts={tts} onClose={tts.stop} />
     </div>
   );
 }

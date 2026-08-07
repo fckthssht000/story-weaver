@@ -8,7 +8,7 @@
  */
 import type { Chapter, DocNode, Story } from "@/types";
 
-const DB_NAME = "storyapp";
+const DB_NAME = "Buklat";
 const DB_VERSION = 1;
 
 export const STORE_STORIES = "downloaded_stories";

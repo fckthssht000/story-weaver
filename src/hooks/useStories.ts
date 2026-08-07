@@ -4,8 +4,12 @@ import {
   deleteStory,
   fetchMyStories,
   fetchPublishedStories,
+  fetchRecentReads,
+  fetchDiscoverStories,
+  fetchTopStories,
   fetchStory,
   updateStory,
+  fetchBookmarks,
 } from "@/services/storyService";
 import type { Story } from "@/types";
 
@@ -24,11 +28,41 @@ export function useStory(storyId: string | undefined) {
   });
 }
 
+export function useRecentReads(userId: string | null) {
+  return useQuery({
+    queryKey: ["recent-reads", userId],
+    enabled: !!userId,
+    queryFn: () => fetchRecentReads(userId!),
+  });
+}
+
+export function useDiscoverStories() {
+  return useQuery({
+    queryKey: ["discover-stories"],
+    queryFn: () => fetchDiscoverStories(),
+  });
+}
+
+export function useTopStories() {
+  return useQuery({
+    queryKey: ["top-stories"],
+    queryFn: () => fetchTopStories(),
+  });
+}
+
 export function useMyStories(userId: string | null) {
   return useQuery({
     queryKey: ["my-stories", userId],
     enabled: !!userId,
     queryFn: () => fetchMyStories(userId!),
+  });
+}
+
+export function useBookmarks(userId: string | null) {
+  return useQuery({
+    queryKey: ["bookmarks", userId],
+    enabled: !!userId,
+    queryFn: () => fetchBookmarks(userId!),
   });
 }
 

@@ -4,12 +4,23 @@ import type { Chapter, ChapterSummary, DocNode, Story, StoryWithAuthor } from "@
 import { EMPTY_DOC } from "@/types";
 
 const STORY_SELECT =
-  "id,author_id,title,description,cover_url,status,genre,created_at,updated_at";
-const AUTHOR_SELECT = "author:profiles!stories_author_id_fkey(id,username,display_name,avatar_url)";
+  "id,author_id,title,description,cover_url,status,genre,created_at,updated_at,chapters(count),story_likes(count)";
+const AUTHOR_SELECT = "author:profiles!stories_author_id_fkey(id,username,display_name,avatar_url,bio)";
 
 function unwrap<T>(res: { data: T | null; error: { message: string } | null }): T {
   if (res.error) throw new Error(res.error.message);
   return res.data as T;
+}
+
+function mapStory(story: any): StoryWithAuthor {
+  if (!story) return story;
+  const chapter_count = Array.isArray(story.chapters) ? story.chapters[0]?.count : story.chapters?.count;
+  const like_count = Array.isArray(story.story_likes) ? story.story_likes[0]?.count : story.story_likes?.count;
+  return {
+    ...story,
+    chapter_count: chapter_count ?? 0,
+    like_count: like_count ?? 0,
+  } as StoryWithAuthor;
 }
 
 /* ---------- reads ---------- */
@@ -25,24 +36,91 @@ export async function fetchPublishedStories(options?: { genre?: string; search?:
   if (options?.genre) query = query.eq("genre", options.genre);
   if (options?.search) query = query.ilike("title", `%${options.search}%`);
 
-  return unwrap(await query) as unknown as StoryWithAuthor[];
+  const data = unwrap(await query) as any[];
+  return data.map(mapStory);
+}
+
+export async function fetchRecentReads(userId: string) {
+  const { data, error } = await supabase
+    .from("reading_progress")
+    .select(`
+      story_id,
+      updated_at,
+      story:stories(${STORY_SELECT},${AUTHOR_SELECT})
+    `)
+    .eq("user_id", userId)
+    .order("updated_at", { ascending: false })
+    .limit(10);
+
+  if (error) throw new Error(error.message);
+  
+  // Unwrap the joined story object, filter out any nulls if a story was deleted
+  return data
+    .map((d) => mapStory(d.story))
+    .filter(Boolean);
+}
+
+export async function fetchBookmarks(userId: string) {
+  const { data, error } = await supabase
+    .from("user_bookmarks" as any)
+    .select(`
+      story_id,
+      created_at,
+      story:stories(${STORY_SELECT},${AUTHOR_SELECT})
+    `)
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false });
+
+  if (error) throw new Error(error.message);
+  
+  return (data as any[])
+    .map((d) => mapStory(d.story))
+    .filter(Boolean);
+}
+
+// Temporary methods for the different sections until we have dedicated backend stats
+export async function fetchDiscoverStories() {
+  // Just returning oldest stories as "discover" for now
+  const data = unwrap(
+    await supabase
+      .from("stories")
+      .select(`${STORY_SELECT},${AUTHOR_SELECT}`)
+      .eq("status", "published")
+      .order("created_at", { ascending: true })
+      .limit(10)
+  ) as any[];
+  return data.map(mapStory);
+}
+
+export async function fetchTopStories() {
+  // Sort by title alphabetically as a pseudo-random "top" list
+  const data = unwrap(
+    await supabase
+      .from("stories")
+      .select(`${STORY_SELECT},${AUTHOR_SELECT}`)
+      .eq("status", "published")
+      .order("title", { ascending: true })
+      .limit(10)
+  ) as any[];
+  return data.map(mapStory);
 }
 
 export async function fetchStory(id: string) {
   const data = unwrap(
     await supabase.from("stories").select(`${STORY_SELECT},${AUTHOR_SELECT}`).eq("id", id).maybeSingle(),
   );
-  return (data ?? null) as unknown as StoryWithAuthor | null;
+  return data ? mapStory(data) : null;
 }
 
 export async function fetchMyStories(userId: string) {
-  return unwrap(
+  const data = unwrap(
     await supabase
       .from("stories")
-      .select(STORY_SELECT)
+      .select(`${STORY_SELECT},${AUTHOR_SELECT}`)
       .eq("author_id", userId)
       .order("updated_at", { ascending: false }),
-  ) as unknown as Story[];
+  ) as any[];
+  return data.map(mapStory);
 }
 
 export async function fetchChapterSummaries(storyId: string) {

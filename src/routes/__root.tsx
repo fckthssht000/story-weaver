@@ -3,13 +3,14 @@ import {
   Outlet,
   Link,
   createRootRouteWithContext,
+  useNavigate,
   useRouter,
   useRouterState,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
-import { BookOpen, Library, PenLine, User } from "lucide-react";
+import { useEffect, useState, type ReactNode } from "react";
+import { BookOpen, Library, PenLine, Search, User } from "lucide-react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -17,6 +18,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { Toaster } from "@/components/ui/sonner";
 import { syncDownloads, syncProgress } from "@/services/syncService";
 import { cn } from "@/lib/utils";
+import { Input } from "@/components/ui/input";
+import { useAuth } from "@/hooks/useAuth";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 function NotFoundComponent() {
   return (
@@ -83,7 +87,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
-      { title: "StoryApp — Read and write short fiction" },
+      { title: "Buklat — Read and write short fiction" },
       {
         name: "description",
         content:
@@ -131,22 +135,53 @@ const TABS = [
 ] as const;
 
 function Chrome() {
+  const { profile, user } = useAuth();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const locationSearch = useRouterState({ select: (s) => s.location.search });
+  const navigate = useNavigate();
   const immersive = pathname.startsWith("/read/");
   // The chapter editor replaces the bottom nav with its own sticky toolbar.
   const editing = /^\/write\/.+/.test(pathname);
+
+  const [headerSearch, setHeaderSearch] = useState("");
+
+  // Keep the search input in sync with the URL when on the home page.
+  useEffect(() => {
+    if (pathname === "/") {
+      setHeaderSearch((locationSearch as any).search ?? "");
+    } else {
+      setHeaderSearch("");
+    }
+  }, [pathname, locationSearch]);
+
+  const handleHeaderSearch = (value: string) => {
+    setHeaderSearch(value);
+    void navigate({ to: "/", search: { search: value } });
+  };
 
   if (immersive) return <Outlet />;
 
   return (
     <div className={cn("min-h-screen", editing ? "pb-16 sm:pb-6" : "pb-20")}>
       <header className="sticky top-0 z-30 border-b bg-background/85 backdrop-blur">
-        <div className="mx-auto flex h-14 max-w-3xl items-center justify-between px-4">
-          <Link to="/" className="font-display text-lg font-bold tracking-tight">
-            Story<span className="text-primary">App</span>
+        <div className="mx-auto flex h-14 max-w-3xl items-center gap-3 px-4">
+          <Link to="/" className="shrink-0 flex items-center gap-2.5">
+            <div className="flex items-center justify-center size-9 rounded-[0.4rem] bg-foreground text-background font-display font-black text-2xl leading-none">
+              B
+            </div>
+            <div className="flex flex-col justify-center">
+              <span className="font-display text-[1.1rem] font-bold tracking-tight leading-none">
+                Buk<span className="text-primary">lat</span>
+              </span>
+              <span className="text-[0.55rem] font-bold uppercase tracking-[0.2em] text-muted-foreground mt-1 leading-none">
+                Offline Reader
+              </span>
+            </div>
           </Link>
+
+          {/* Desktop nav — Account lives in the header icon, so omit it here */}
           <nav className="hidden gap-1 sm:flex">
-            {TABS.map((t) => (
+            {TABS.filter((t) => t.to !== "/account").map((t) => (
               <Link
                 key={t.to}
                 to={t.to}
@@ -158,6 +193,38 @@ function Chrome() {
               </Link>
             ))}
           </nav>
+
+          {/* Search + Account — always visible in the header */}
+          <div className="flex flex-1 items-center justify-end gap-1">
+            <div className="relative">
+              <Search className="pointer-events-none absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                value={headerSearch}
+                onChange={(e) => handleHeaderSearch(e.target.value)}
+                placeholder="Search stories…"
+                aria-label="Search stories"
+                className="h-8 w-28 rounded-full pl-8 text-sm transition-all focus:w-44 sm:w-40 sm:focus:w-56"
+              />
+            </div>
+            <Link to="/account" aria-label="Account">
+              <button
+                type="button"
+                aria-label="Account"
+                className="inline-flex size-9 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted"
+              >
+                {user ? (
+                  <Avatar className="size-7 border border-border/50">
+                    <AvatarImage src={profile?.avatar_url || undefined} />
+                    <AvatarFallback className="text-[0.6rem] uppercase">
+                      {(profile?.display_name || profile?.username || user.email || "U").charAt(0)}
+                    </AvatarFallback>
+                  </Avatar>
+                ) : (
+                  <User className="size-4" />
+                )}
+              </button>
+            </Link>
+          </div>
         </div>
       </header>
 
@@ -166,26 +233,26 @@ function Chrome() {
       </main>
 
       {editing ? null : (
-      <nav className="fixed inset-x-0 bottom-0 z-30 border-t bg-background/95 backdrop-blur sm:hidden">
-        <div className="mx-auto flex max-w-3xl">
-          {TABS.map((t) => (
-            <Link
-              key={t.to}
-              to={t.to}
-              className="flex flex-1 flex-col items-center gap-0.5 py-2.5 text-[0.65rem] text-muted-foreground"
-              activeProps={{ className: "text-primary font-semibold" }}
-              activeOptions={{ exact: t.to === "/" }}
-            >
-              {({ isActive }) => (
-                <>
-                  <t.icon className={cn("size-5", isActive && "stroke-[2.4]")} />
-                  {t.label}
-                </>
-              )}
-            </Link>
-          ))}
-        </div>
-      </nav>
+        <nav className="fixed inset-x-0 bottom-0 z-30 border-t bg-background/95 backdrop-blur sm:hidden">
+          <div className="mx-auto flex max-w-3xl">
+            {TABS.filter((t) => t.to !== "/account").map((t) => (
+              <Link
+                key={t.to}
+                to={t.to}
+                className="flex flex-1 flex-col items-center gap-0.5 py-2.5 text-[0.65rem] text-muted-foreground"
+                activeProps={{ className: "text-primary font-semibold" }}
+                activeOptions={{ exact: t.to === "/" }}
+              >
+                {({ isActive }) => (
+                  <>
+                    <t.icon className={cn("size-5", isActive && "stroke-[2.4]")} />
+                    {t.label}
+                  </>
+                )}
+              </Link>
+            ))}
+          </div>
+        </nav>
       )}
     </div>
   );

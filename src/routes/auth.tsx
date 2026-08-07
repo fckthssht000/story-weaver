@@ -12,9 +12,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Sign in — StoryApp" },
+      { title: "Sign in — Buklat" },
       { name: "description", content: "Sign in to publish stories and sync your reading." },
-      { property: "og:title", content: "Sign in — StoryApp" },
+      { property: "og:title", content: "Sign in — Buklat" },
       {
         property: "og:description",
         content: "Sign in to publish stories and sync your reading progress.",
