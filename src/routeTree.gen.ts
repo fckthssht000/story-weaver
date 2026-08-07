@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as LibraryRouteImport } from './routes/library'
 import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticated/account'
+import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as ReadStoryIdRouteImport } from './routes/read.$storyId'
 import { Route as StoryStoryIdRouteImport } from './routes/story.$storyId'
 import { Route as AuthenticatedWriteIndexRouteImport } from './routes/_authenticated/write.index'
@@ -43,6 +44,11 @@ const AuthenticatedAccountRoute = AuthenticatedAccountRouteImport.update({
   path: '/account',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const ReadStoryIdRoute = ReadStoryIdRouteImport.update({
   id: '/read/$storyId',
   path: '/read/$storyId',
@@ -70,6 +76,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/library': typeof LibraryRoute
   '/account': typeof AuthenticatedAccountRoute
+  '/settings': typeof AuthenticatedSettingsRoute
   '/read/$storyId': typeof ReadStoryIdRoute
   '/story/$storyId': typeof StoryStoryIdRoute
   '/write/$storyId': typeof AuthenticatedWriteStoryIdRoute
@@ -80,6 +87,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/library': typeof LibraryRoute
   '/account': typeof AuthenticatedAccountRoute
+  '/settings': typeof AuthenticatedSettingsRoute
   '/read/$storyId': typeof ReadStoryIdRoute
   '/story/$storyId': typeof StoryStoryIdRoute
   '/write/$storyId': typeof AuthenticatedWriteStoryIdRoute
@@ -92,6 +100,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/library': typeof LibraryRoute
   '/_authenticated/account': typeof AuthenticatedAccountRoute
+  '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/read/$storyId': typeof ReadStoryIdRoute
   '/story/$storyId': typeof StoryStoryIdRoute
   '/_authenticated/write/$storyId': typeof AuthenticatedWriteStoryIdRoute
@@ -104,6 +113,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/library'
     | '/account'
+    | '/settings'
     | '/read/$storyId'
     | '/story/$storyId'
     | '/write/$storyId'
@@ -114,6 +124,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/library'
     | '/account'
+    | '/settings'
     | '/read/$storyId'
     | '/story/$storyId'
     | '/write/$storyId'
@@ -125,6 +136,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/library'
     | '/_authenticated/account'
+    | '/_authenticated/settings'
     | '/read/$storyId'
     | '/story/$storyId'
     | '/_authenticated/write/$storyId'
@@ -177,6 +189,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAccountRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/settings': {
+      id: '/_authenticated/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AuthenticatedSettingsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/read/$storyId': {
       id: '/read/$storyId'
       path: '/read/$storyId'
@@ -210,12 +229,14 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAccountRoute: typeof AuthenticatedAccountRoute
+  AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedWriteStoryIdRoute: typeof AuthenticatedWriteStoryIdRoute
   AuthenticatedWriteIndexRoute: typeof AuthenticatedWriteIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAccountRoute: AuthenticatedAccountRoute,
+  AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedWriteStoryIdRoute: AuthenticatedWriteStoryIdRoute,
   AuthenticatedWriteIndexRoute: AuthenticatedWriteIndexRoute,
 }
