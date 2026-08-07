@@ -86,7 +86,6 @@ export async function createStory(input: {
         description: input.description ?? null,
         genre: input.genre ?? null,
         cover_url: input.cover_url ?? null,
-        ...(input.cover_url ? { cover_url: input.cover_url } : {}),
         status: "draft",
       }, { onConflict: "id", ignoreDuplicates: false })
       .select(STORY_SELECT)
