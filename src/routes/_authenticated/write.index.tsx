@@ -1,21 +1,29 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { Plus } from "lucide-react";
+import { MoreVertical, Pencil, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
+import { useRealtime } from "@/hooks/useRealtime";
 import { useMyStories, useStoryMutations } from "@/hooks/useStories";
+import { StoryFormDialog, type StoryDraft } from "@/components/story/StoryFormDialog";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { GENRES } from "@/types";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import type { Story } from "@/types";
 
 export const Route = createFileRoute("/_authenticated/write/")({
   head: () => ({
@@ -33,24 +41,49 @@ function MyStories() {
   const { userId } = useAuth();
   const navigate = useNavigate();
   const stories = useMyStories(userId);
-  const { create } = useStoryMutations(userId);
+  const { create, update, remove } = useStoryMutations(userId);
 
-  const [open, setOpen] = useState(false);
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [genre, setGenre] = useState<string>("");
+  useRealtime(["stories"], { filter: userId ? `author_id=eq.${userId}` : undefined, enabled: !!userId });
 
-  const submit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const [createOpen, setCreateOpen] = useState(false);
+  const [editing, setEditing] = useState<Story | null>(null);
+  const [deleting, setDeleting] = useState<Story | null>(null);
+
+  const submitNew = (draft: StoryDraft) => {
     if (!userId) return;
     create.mutate(
-      { title, description, ...(genre ? { genre } : {}) },
+      {
+        title: draft.title,
+        description: draft.description,
+        ...(draft.genre ? { genre: draft.genre } : {}),
+        ...(draft.cover_url ? { cover_url: draft.cover_url } : {}),
+      },
       {
         onSuccess: (story) => {
-          setOpen(false);
-          setTitle("");
-          setDescription("");
+          setCreateOpen(false);
           navigate({ to: "/write/$storyId", params: { storyId: story.id } });
+        },
+        onError: (err) => toast.error(err.message),
+      },
+    );
+  };
+
+  const submitEdit = (draft: StoryDraft) => {
+    if (!editing) return;
+    update.mutate(
+      {
+        id: editing.id,
+        patch: {
+          title: draft.title,
+          description: draft.description || null,
+          genre: draft.genre || null,
+          ...(draft.cover_url !== undefined ? { cover_url: draft.cover_url } : {}),
+        },
+      },
+      {
+        onSuccess: () => {
+          setEditing(null);
+          toast.success("Story updated");
         },
         onError: (err) => toast.error(err.message),
       },
@@ -66,52 +99,9 @@ function MyStories() {
             Write the words; the reader handles the layout.
           </p>
         </div>
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger asChild>
-            <Button>
-              <Plus className="size-4" /> New
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle className="font-display">Start a new story</DialogTitle>
-            </DialogHeader>
-            <form className="space-y-4" onSubmit={submit}>
-              <div className="space-y-1.5">
-                <Label htmlFor="title">Title</Label>
-                <Input id="title" required value={title} onChange={(e) => setTitle(e.target.value)} />
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="desc">Description</Label>
-                <Textarea
-                  id="desc"
-                  rows={3}
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                />
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="genre">Genre</Label>
-                <select
-                  id="genre"
-                  value={genre}
-                  onChange={(e) => setGenre(e.target.value)}
-                  className="h-9 w-full rounded-md border bg-background px-3 text-sm"
-                >
-                  <option value="">Unspecified</option>
-                  {GENRES.map((g) => (
-                    <option key={g} value={g}>
-                      {g}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <Button type="submit" className="w-full" disabled={create.isPending}>
-                Create draft
-              </Button>
-            </form>
-          </DialogContent>
-        </Dialog>
+        <Button onClick={() => setCreateOpen(true)}>
+          <Plus className="size-4" /> New
+        </Button>
       </header>
 
       {stories.isLoading ? (
@@ -123,12 +113,17 @@ function MyStories() {
       ) : (
         <ul className="divide-y rounded-lg border bg-card">
           {stories.data.map((s) => (
-            <li key={s.id}>
+            <li key={s.id} className="flex items-center gap-2 pr-2">
               <Link
                 to="/write/$storyId"
                 params={{ storyId: s.id }}
-                className="flex items-center gap-3 px-4 py-3 transition-colors hover:bg-muted"
+                className="flex min-w-0 flex-1 items-center gap-3 px-4 py-3 transition-colors hover:bg-muted"
               >
+                <div className="h-14 w-10 shrink-0 overflow-hidden rounded border bg-muted">
+                  {s.cover_url ? (
+                    <img src={s.cover_url} alt="" className="h-full w-full object-cover" />
+                  ) : null}
+                </div>
                 <div className="min-w-0 flex-1">
                   <p className="truncate font-display text-base font-semibold">{s.title}</p>
                   <p className="mt-0.5 text-xs text-muted-foreground">
@@ -145,10 +140,71 @@ function MyStories() {
                   {s.status}
                 </span>
               </Link>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" aria-label={`Options for ${s.title}`}>
+                    <MoreVertical className="size-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onSelect={() => setEditing(s)}>
+                    <Pencil className="size-4" /> Edit details
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className="text-destructive"
+                    onSelect={() => setDeleting(s)}
+                  >
+                    <Trash2 className="size-4" /> Delete story
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </li>
           ))}
         </ul>
       )}
+
+      <StoryFormDialog
+        open={createOpen}
+        onOpenChange={setCreateOpen}
+        userId={userId}
+        pending={create.isPending}
+        onSubmit={submitNew}
+      />
+      <StoryFormDialog
+        open={!!editing}
+        onOpenChange={(o) => !o && setEditing(null)}
+        story={editing ?? undefined}
+        userId={userId}
+        pending={update.isPending}
+        onSubmit={submitEdit}
+      />
+
+      <AlertDialog open={!!deleting} onOpenChange={(o) => !o && setDeleting(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete “{deleting?.title}”?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Every chapter goes with it. This can't be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Keep it</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                const id = deleting?.id;
+                setDeleting(null);
+                if (id)
+                  remove.mutate(id, {
+                    onSuccess: () => toast.success("Story deleted"),
+                    onError: (err) => toast.error(err.message),
+                  });
+              }}
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
