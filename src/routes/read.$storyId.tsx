@@ -132,6 +132,7 @@ function Reader() {
           >
             <ArrowLeft className="size-4" />
           </Button>
+
           <p className="truncate px-2 text-xs text-[var(--reader-soft)]">
             {story.data?.title ?? ""}
             {list.length ? ` · ${index + 1}/${list.length}` : ""}
