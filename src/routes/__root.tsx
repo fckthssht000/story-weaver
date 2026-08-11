@@ -303,8 +303,19 @@ function SyncAgent() {
     };
   }, [queryClient]);
 
+  useEffect(
+    () =>
+      initNative(() => {
+        if (window.location.pathname === "/") return false;
+        router.history.back();
+        return true;
+      }),
+    [router],
+  );
+
   return null;
 }
+
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
