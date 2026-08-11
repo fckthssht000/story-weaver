@@ -12,11 +12,20 @@ export default defineConfig({
     // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
     // nitro/vite builds from this
     server: { entry: "server" },
+    nitro: {
+      preset: "vercel-edge",
+      vercel: {
+        config: {
+          regions: ["iad1"],
+        },
+      },
+    },
   },
   vite: {
     plugins: [
       VitePWA({
         registerType: "autoUpdate",
+        outDir: ".output/public",
         includeAssets: ["favicon.ico", "icon.png"],
         manifest: {
           name: "Buklat",
