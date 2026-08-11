@@ -16,9 +16,6 @@ export default defineConfig({
   vite: {
     plugins: [
       VitePWA({
-        registerType: "autoUpdate",
-        injectRegister: null,
-        filename: "sw.js",
         // The served client assets live in .output/public; emit + precache there
         // so /sw.js actually exists on the deployed site.
         outDir: ".output/public",
@@ -45,8 +42,9 @@ export default defineConfig({
           ],
         },
         workbox: {
-          globPatterns: ["**/*.{js,css,ico,png,svg,webmanifest}"],
           globDirectory: ".output/public",
+          globPatterns: ["**/*.{js,css,ico,png,svg,webmanifest}"],
+          globIgnores: ["favicon.ico", "icon.png", "manifest.webmanifest"],
           navigateFallback: null,
           runtimeCaching: [
             {
