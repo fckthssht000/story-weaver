@@ -19,6 +19,10 @@ export default defineConfig({
         registerType: "autoUpdate",
         injectRegister: null,
         filename: "sw.js",
+        // The served client assets live in dist/client; emit + precache there
+        // so /sw.js actually exists on the deployed site.
+        outDir: "dist/client",
+
         includeAssets: ["favicon.ico", "icon.png"],
         manifest: {
           name: "Buklat",
@@ -42,7 +46,7 @@ export default defineConfig({
         },
         workbox: {
           globPatterns: ["**/*.{js,css,ico,png,svg,webmanifest}"],
-          globDirectory: ".output/public",
+          globDirectory: "dist/client",
           navigateFallback: null,
           runtimeCaching: [
             {
