@@ -18,6 +18,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Toaster } from "@/components/ui/sonner";
 import { syncDownloads, syncProgress } from "@/services/syncService";
 import { cn } from "@/lib/utils";
+import { initNative } from "@/lib/native";
+
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/hooks/useAuth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -303,8 +305,19 @@ function SyncAgent() {
     };
   }, [queryClient]);
 
+  useEffect(
+    () =>
+      initNative(() => {
+        if (window.location.pathname === "/") return false;
+        router.history.back();
+        return true;
+      }),
+    [router],
+  );
+
   return null;
 }
+
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
