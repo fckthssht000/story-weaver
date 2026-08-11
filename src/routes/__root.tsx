@@ -19,6 +19,8 @@ import { Toaster } from "@/components/ui/sonner";
 import { syncDownloads, syncProgress } from "@/services/syncService";
 import { cn } from "@/lib/utils";
 import { initNative } from "@/lib/native";
+import { registerServiceWorker } from "@/lib/pwa";
+
 
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/hooks/useAuth";
@@ -290,14 +292,8 @@ function SyncAgent() {
     document.addEventListener("visibilitychange", run);
     window.addEventListener("online", run);
 
-    // Register Service Worker for PWA
-    if ("serviceWorker" in navigator) {
-      const isDev = import.meta.env.DEV;
-      const swUrl = isDev ? "/dev-sw.js?dev-sw" : "/sw.js";
-      navigator.serviceWorker.register(swUrl, { scope: "/" }).catch((err) => {
-        console.error("Service worker registration failed:", err);
-      });
-    }
+    registerServiceWorker();
+
 
     return () => {
       document.removeEventListener("visibilitychange", run);

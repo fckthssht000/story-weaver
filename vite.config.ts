@@ -17,12 +17,16 @@ export default defineConfig({
     plugins: [
       VitePWA({
         registerType: "autoUpdate",
+        injectRegister: null,
+        filename: "sw.js",
         includeAssets: ["favicon.ico", "icon.png"],
         manifest: {
           name: "Buklat",
           short_name: "Buklat",
           description: "Offline reader and writer",
           theme_color: "#ffffff",
+          background_color: "#ffffff",
+          display: "standalone",
           icons: [
             {
               src: "icon.png",
@@ -37,14 +41,38 @@ export default defineConfig({
           ],
         },
         workbox: {
-          globPatterns: ["**/*.{js,css,ico,png,svg}"],
+          globPatterns: ["**/*.{js,css,ico,png,svg,webmanifest}"],
           globDirectory: ".output/public",
           navigateFallback: null,
+          runtimeCaching: [
+            {
+              // HTML navigations: always try the network first.
+              urlPattern: ({ request, url }) =>
+                request.mode === "navigate" && !url.pathname.startsWith("/~oauth"),
+              handler: "NetworkFirst",
+              options: {
+                cacheName: "html-navigations",
+                networkTimeoutSeconds: 5,
+                expiration: { maxEntries: 50, maxAgeSeconds: 60 * 60 * 24 },
+              },
+            },
+            {
+              // Same-origin hashed build assets.
+              urlPattern: ({ request, sameOrigin }) =>
+                sameOrigin && ["script", "style", "font", "image"].includes(request.destination),
+              handler: "CacheFirst",
+              options: {
+                cacheName: "static-assets",
+                expiration: { maxEntries: 200, maxAgeSeconds: 60 * 60 * 24 * 30 },
+              },
+            },
+          ],
         },
         devOptions: {
-          enabled: true,
+          enabled: false,
         },
       }),
+
     ],
   },
 });
