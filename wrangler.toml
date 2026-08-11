@@ -1,0 +1,25 @@
+name = "buklat"
+compatibility_date = "2024-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+[env.production]
+name = "buklat"
+
+[env.preview]
+name = "buklat-preview"
+
+[build]
+command = "npm run build"
+cwd = "."
+watch_dir = "src"
+
+[build.upload]
+format = "modules"
+main = ".output/server/index.mjs"
+rules = [
+  { type = "ESModule", globs = ["**/*.mjs"], fallthrough = true }
+]
+
+[assets]
+directory = ".output/public"
+binding = "ASSETS"

@@ -7,7 +7,9 @@
     "dev": "vite dev",
     "build": "vite build",
     "build:dev": "vite build --mode development",
-    "preview": "vite preview",
+    "preview": "npx wrangler pages dev .output/public",
+    "deploy": "npx wrangler pages deploy .output/public",
+    "deploy:prod": "npx wrangler pages deploy .output/public --env production",
     "lint": "eslint .",
     "format": "prettier --write ."
   },
