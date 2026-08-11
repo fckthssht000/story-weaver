@@ -14,6 +14,12 @@ export default defineConfig({
     server: { entry: "server" },
   },
   vite: {
+    build: {
+      outDir: ".output",
+      rollupOptions: {
+        external: ["@capacitor/status-bar", "@capacitor/app"]
+      }
+    },
     plugins: [
       VitePWA({
         // The served client assets live in .output/public; emit + precache there
@@ -76,10 +82,5 @@ export default defineConfig({
       }),
 
     ],
-    build: {
-      rollupOptions: {
-        external: ["@capacitor/status-bar", "@capacitor/app"]
-      }
-    }
   },
 });
