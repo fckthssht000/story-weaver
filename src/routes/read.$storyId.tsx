@@ -123,16 +123,11 @@ function Reader() {
             size="icon"
             aria-label="Back to story"
             onClick={() => {
-              if (window.history.length > 1) {
-                window.history.back();
-              } else {
-                navigate({ to: "/story/$storyId", params: { storyId } });
-              }
+              navigate({ to: "/story/$storyId", params: { storyId } });
             }}
           >
             <ArrowLeft className="size-4" />
           </Button>
-
           <p className="truncate px-2 text-xs text-[var(--reader-soft)]">
             {story.data?.title ?? ""}
             {list.length ? ` · ${index + 1}/${list.length}` : ""}
